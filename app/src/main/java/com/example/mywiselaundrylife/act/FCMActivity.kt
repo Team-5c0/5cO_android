@@ -6,14 +6,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.mywiselaundrylife.data.LaundryData
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
-import com.example.mywiselaundrylife.databinding.ItemLaundryBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -22,12 +19,6 @@ class FCMActivity : AppCompatActivity() {
     private var backPressedTime: Long = 0
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityMainBinding
-
-    private val lnd1 = LaundryData("세탁기1", null)
-    private val lnd2 = LaundryData("세탁기2", null)
-    private val lnd3 = LaundryData("세탁기3", null)
-    private val lnd4 = LaundryData("세탁기4", null)
-    private val DEFAULT_TIME : Long = 5400
 
     companion object {
         private val PERMISSION_REQUEST_CODE = 5000
@@ -46,11 +37,6 @@ class FCMActivity : AppCompatActivity() {
         permissionCheck()
         setToken()
 
-        binding.laundry1.useBtn.setOnClickListener { startTime(lnd1, binding.laundry1.laundTime) }
-        binding.laundry2.useBtn.setOnClickListener { startTime(lnd2, binding.laundry2.laundTime) }
-        binding.laundry3.useBtn.setOnClickListener { startTime(lnd3, binding.laundry3.laundTime) }
-        binding.laundry4.useBtn.setOnClickListener { startTime(lnd4, binding.laundry4.laundTime) }
-
         binding.logOutBtn.setOnClickListener {
             editor.remove("isLogin")
             editor.apply()
@@ -58,22 +44,6 @@ class FCMActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-    }
-
-    private fun startTime(laundry: LaundryData, timeText: TextView) {
-        if (laundry.time == null) {
-            laundry.time = DEFAULT_TIME // 상수로 설정한 시간 사용
-            laundry.userId = sharedPreferences.getString("myId", "누구세요")
-            updateTimeText(laundry.time!!, timeText)
-        } else {
-            Log.d("myTag", "${laundry.name} 사용중") // 세탁기 이름 추가
-        }
-    }
-
-    private fun updateTimeText(time: Long, timeText: TextView) {
-        val hours = time / 3600
-        val minutes = (time % 3600) / 60
-        timeText.text = "${hours}시간 ${minutes}분"
     }
 
     override fun onBackPressed() {

@@ -5,59 +5,78 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View
+        android:id="@+id/navigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#D9D9D9"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/logOutBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="로그아웃"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp"/>
+        android:text="로그아웃 하기"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="@id/navigationBar"
+        app:layout_constraintStart_toStartOf="@id/navigationBar"
+        app:layout_constraintBottom_toBottomOf="@+id/navigationBar"
+        android:layout_marginStart="20dp"/>
 
-    <GridLayout
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="2"
+        app:layout_constraintTop_toTopOf="@id/navigationBar"
+        app:layout_constraintBottom_toBottomOf="@id/navigationBar"
+        app:layout_constraintEnd_toEndOf="@id/navigationBar"
+        android:layout_marginEnd="20dp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:weightSum="2">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="내 세탁 남은 시간 : "/>
+            <TextView
+                android:id="@+id/laundryTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="00시간 00분"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:weightSum="2">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="내 건조 남은 시간 : "/>
+            <TextView
+                android:id="@+id/dryerTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="00시간 00분"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/logOutBtn"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/navigationBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="10dp"
-        android:columnCount="2">
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-        <include
-            layout="@layout/item_laundry"
-            android:id="@+id/laundry1"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-
-        <include
-            layout="@layout/item_laundry"
-            android:id="@+id/laundry2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1" />
-
-        <include
-            layout="@layout/item_laundry"
-            android:id="@+id/laundry3"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-
-        <include
-            layout="@layout/item_laundry"
-            android:id="@+id/laundry4"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-
-
-
-    </GridLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

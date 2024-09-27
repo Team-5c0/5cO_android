@@ -1,4 +1,4 @@
 package com.example.mywiselaundrylife.data
 
-class Timer {
+class LaundryLst {
 }

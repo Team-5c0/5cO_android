@@ -1,50 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="2">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp">
 
-    <ImageView
-        android:id="@+id/laundImg"
+    <TextView
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/remainTimeTxt"
+        android:id="@+id/laundTitle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@drawable/baseline_local_laundry_service_24"/>
+        android:text="세탁기"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:gravity="center"/>
 
-    <LinearLayout
+    <TextView
+        app:layout_constraintBottom_toTopOf="@+id/remainTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/remainTimeTxt"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:weightSum="4"
-        android:layout_weight="1">
-        <TextView
-            android:id="@+id/laundTitle"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="세탁기"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:gravity="center"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="남은 시간"
+        android:textColor="@color/black"
+        android:textSize="15sp"/>
 
-        <TextView
-            android:id="@+id/laundTime"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="사용자 없음"
-            android:textColor="@color/black"
-            android:textSize="15sp"/>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/useBtn"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="사용하기"/>
-    </LinearLayout>
-
-
-</LinearLayout>
+    <TextView
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/remainTime"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="0시 0분"
+        android:textColor="@color/black"
+        android:textSize="15sp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
