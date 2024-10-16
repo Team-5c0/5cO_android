@@ -10,19 +10,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
+import com.example.mywiselaundrylife.frag.FragMain
+import com.example.mywiselaundrylife.serve.OnItemClickListener
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 
-class FCMActivity : AppCompatActivity() {
+class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
     private var backPressedTime: Long = 0
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityMainBinding
 
     companion object {
-        private val PERMISSION_REQUEST_CODE = 5000
-        private val TAG = "FCMActivity"
+        private const val PERMISSION_REQUEST_CODE = 5000
+        private const val TAG = "FCMActivity"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +33,6 @@ class FCMActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 임시저장한거 불러오기
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
@@ -40,71 +42,76 @@ class FCMActivity : AppCompatActivity() {
         binding.logOutBtn.setOnClickListener {
             editor.remove("isLogin")
             editor.apply()
-            val intent = Intent(this, StartActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, StartActivity::class.java))
             finish()
+        }
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frame, FragMain())
+                .commit()
         }
     }
 
+    // 인터페이스 구현: 아이템 클릭 시 TextView 업데이트
+    override fun onItemClicked(itemName: String) {
+        if("세탁기" in itemName){
+            binding.laundryTime.text = "1시간 30분" // TextView 업데이트
+        } else{
+            binding.dryerTime.text = "1시간 30분" // TextView 업데이트
+        }
+        Toast.makeText(this, "$itemName 선택됨", Toast.LENGTH_SHORT).show()
+    }
+
     override fun onBackPressed() {
-        if (backPressedTime + 2000 > System.currentTimeMillis()) {
-            super.onBackPressed() // 앱 종료
+        Log.d("mine", "${supportFragmentManager.backStackEntryCount}")
+        if (backPressedTime + 2000 > System.currentTimeMillis() && supportFragmentManager.backStackEntryCount <= 0) {
+            super.onBackPressed()
             return
+        } else if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
         } else {
-            // 첫 번째 뒤로가기 클릭 시 메시지 표시
             Toast.makeText(this, "뒤로 버튼을 한 번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show()
         }
-        // 마지막으로 뒤로가기 버튼을 누른 시간 기록
         backPressedTime = System.currentTimeMillis()
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode){
+        when (requestCode) {
             PERMISSION_REQUEST_CODE -> {
-                if(grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(applicationContext, "권한이 허용되지 않음", Toast.LENGTH_SHORT)
-                        .show()
-                } else{
-                    Toast.makeText(applicationContext, "권한이 허용됨", Toast.LENGTH_SHORT)
-                        .show()
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(applicationContext, "권한이 허용되지 않음", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "권한이 허용됨", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun setToken(){
-        // token 가져오기
+    private fun setToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-
-            // FCM 등록 토큰 가져오기
             val token = task.result
-
-            val msg = "FCM Registration token: " + token;
+            val msg = "FCM Registration token: $token"
             Log.d(TAG, msg)
             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
         })
     }
 
-    private fun permissionCheck(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+    private fun permissionCheck() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permissionCheck = ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.POST_NOTIFICATIONS
+                this, android.Manifest.permission.POST_NOTIFICATIONS
             )
-            if (permissionCheck != PackageManager.PERMISSION_GRANTED){
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    PERMISSION_REQUEST_CODE
+                    this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), PERMISSION_REQUEST_CODE
                 )
             }
         }

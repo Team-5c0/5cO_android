@@ -38,9 +38,6 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    buildFeatures {
-        viewBinding = true
-    }
 }
 
 dependencies {
@@ -48,6 +45,16 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-messaging:24.0.1")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("androidx.fragment:fragment-ktx:1.8.4")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

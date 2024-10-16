@@ -1,15 +1,16 @@
 package com.example.mywiselaundrylife.data
 
+import java.time.LocalDateTime
+
 data class LaundryRoom(
-    val roomId : Int,
-    val roomName : String,
-    var remainLaundry : Int,
-    var remaingDryer : Int,
-    val laundryLst : ArrayList<Laundry>
+    val roomId : String,
+    val roomName : String
 )
 
 data class Laundry(
-    var name : String,
-    var time : Long? = null,
-    var userId : String? = null
+    val laundryId : String,
+    val roomId : String,
+    val name : String,
+    var endTime : LocalDateTime? = null,
+    var userId : Int? = null
 )
