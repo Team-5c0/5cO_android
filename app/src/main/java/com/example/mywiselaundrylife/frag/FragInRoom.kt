@@ -6,11 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.annotation.RequiresApi
 import com.example.mywiselaundrylife.serve.OnItemClickListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mywiselaundrylife.adapter.LaundryAdapter
 import com.example.mywiselaundrylife.data.Laundry
@@ -57,8 +55,9 @@ class FragInRoom : Fragment() {
         binding.recyclerview.setHasFixedSize(true)
 
         laundryAdapter = LaundryAdapter(UserInfo.userLaundryLst){item ->
-            listener?.onItemClicked(item.name) // 클릭된 아이템 이름 전달
+            listener?.onItemClicked(item)
         }
+
         binding.recyclerview.adapter = laundryAdapter
 
         binding.currentRoom.text = "현재 세탁실 : ${UserInfo.currentRoom?.roomName ?: "알 수 없음"}"
@@ -68,6 +67,17 @@ class FragInRoom : Fragment() {
         super.onDetach()
         listener = null // 메모리 누수 방지
     }
+
+    override fun onPause() {
+        super.onPause()
+        laundryAdapter.stopAllTimers()  // 프래그먼트가 일시정지될 때 타이머 정지
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        laundryAdapter.stopAllTimers()  // View가 파괴될 때 타이머 정지
+    }
+
 }
 
 

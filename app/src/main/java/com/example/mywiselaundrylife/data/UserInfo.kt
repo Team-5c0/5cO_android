@@ -11,4 +11,6 @@ object UserInfo {
 
     var userLaundryLst = arrayListOf<Laundry>()
     var currentRoom : LaundryRoom? = null
+
+    var seconds = 20
 }

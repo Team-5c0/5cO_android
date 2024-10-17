@@ -7,10 +7,14 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.mywiselaundrylife.R
+import com.example.mywiselaundrylife.data.Laundry
+import com.example.mywiselaundrylife.data.ListData
+import com.example.mywiselaundrylife.data.UserInfo
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
 import com.example.mywiselaundrylife.frag.FragMain
 import com.example.mywiselaundrylife.serve.OnItemClickListener
@@ -28,16 +32,29 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         private const val TAG = "FCMActivity"
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val usingLandry = ListData.laundryLst.indexOfFirst { it.userId == UserInfo.userId && it.name.contains("세탁기") }
+        val usingDryer = ListData.laundryLst.indexOfFirst { it.userId == UserInfo.userId && it.name.contains("건조기") }
+
+        when{
+            (usingLandry != -1) ->{
+                Toast.makeText(this, "startTime세탁기", Toast.LENGTH_SHORT).show()
+            }
+            (usingDryer != -1) ->{
+                Toast.makeText(this, "startTime건조기", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
         permissionCheck()
-        setToken()
+        setFCMToken()
 
         binding.logOutBtn.setOnClickListener {
             editor.remove("isLogin")
@@ -54,13 +71,13 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     // 인터페이스 구현: 아이템 클릭 시 TextView 업데이트
-    override fun onItemClicked(itemName: String) {
-        if("세탁기" in itemName){
-            binding.laundryTime.text = "1시간 30분" // TextView 업데이트
+    override fun onItemClicked(item : Laundry) {
+        if("세탁기" in item.name){
+            binding.laundryTime.text = item.endTime.toString() // TextView 업데이트
         } else{
-            binding.dryerTime.text = "1시간 30분" // TextView 업데이트
+            binding.dryerTime.text = item.endTime.toString()  // TextView 업데이트
         }
-        Toast.makeText(this, "$itemName 선택됨", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "${item.name} 선택됨", Toast.LENGTH_SHORT).show()
     }
 
     override fun onBackPressed() {
@@ -76,6 +93,11 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         backPressedTime = System.currentTimeMillis()
     }
 
+
+
+
+
+    // FireBase
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
@@ -91,7 +113,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         }
     }
 
-    private fun setToken() {
+    private fun setFCMToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)

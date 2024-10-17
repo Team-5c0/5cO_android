@@ -1,9 +1,9 @@
 package com.example.mywiselaundrylife.adapter
 
-import android.os.Build
 import android.os.Build.VERSION_CODES
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,76 +18,111 @@ import com.example.mywiselaundrylife.databinding.ItemLaundryBinding
 import java.time.Duration
 import java.time.LocalDateTime
 
-class LaundryAdapter(private val laundryLst: ArrayList<Laundry>, private val onItemClick: (Laundry) -> Unit) :
-    RecyclerView.Adapter<LaundryAdapter.LaundryViewHolder>() {
+class LaundryAdapter(
+    private val laundryLst: ArrayList<Laundry>,
+    private val onItemClick: (Laundry) -> Unit
+) : RecyclerView.Adapter<LaundryAdapter.LaundryViewHolder>() {
 
-    inner class LaundryViewHolder(val binding: ItemLaundryBinding) : RecyclerView.ViewHolder(binding.root){
-        val handler = Handler(Looper.getMainLooper())
-        var runnable : Runnable? = null
+    private val viewHolders = mutableListOf<LaundryViewHolder>()
 
-        fun timerStart(endTime : LocalDateTime, selectLaundry: Laundry){
+    inner class LaundryViewHolder(val binding: ItemLaundryBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val handler = Handler(Looper.getMainLooper())
+        var runnable: Runnable? = null
 
-            runnable?.let { handler.removeCallbacks(it) }
+        fun timerStart(selectLaundry: Laundry) {
+            // 이전 타이머 정지
+            timerStop()
 
-            runnable = object : Runnable{
+            // endTime이 null인지 체크
+            if (selectLaundry.endTime == null) {
+                binding.remainTimeTxt.text = "사용자 없음"
+                return  // early return
+            }
+
+            runnable = object : Runnable {
                 @RequiresApi(VERSION_CODES.O)
                 override fun run() {
-                    val duration = Duration.between(LocalDateTime.now(), endTime)
+                    try {
+                        val now = LocalDateTime.now()
 
-                    // 시간이 종료된 경우
-                    if (duration.isNegative || duration.isZero) {
-                        onTimerEnd(selectLaundry, selectLaundry.name)
-                    } else {
-                        updateTimer(duration)
+                        // endTime이 null인지 확인
+                        if (selectLaundry.endTime == null) {
+                            binding.remainTimeTxt.text = "사용자 없음"
+                            binding.view.setBackgroundResource(R.drawable.null_color)
+                            timerStop()
+                            return
+                        }
+
+                        val duration = Duration.between(now, selectLaundry.endTime)
+
+                        // 시간이 종료된 경우
+                        if (duration.isNegative || duration.isZero) {
+                            onTimerEnd(selectLaundry, selectLaundry.name)
+                        } else {
+                            updateTimer(duration)  // 타이머 업데이트
+                            handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
+                        }
+                    } catch (e: Exception) {
+                        Log.e("mine", "Error in timer: ${e.message}")
                     }
                 }
             }
-            handler.post(runnable!!)
+            handler.post(runnable!!)  // runnable 시작
         }
-        fun timerStop(){
-            runnable?.let { handler.removeCallbacks(it) }
+
+        fun timerStop() {
+            if(runnable != null){
+                handler.removeCallbacks(runnable!!)  // 핸들러에서 runnable 제거
+            }
+            runnable = null  // runnable 초기화
         }
 
         @RequiresApi(VERSION_CODES.O)
-        private fun updateTimer(duration: Duration){
+        private fun updateTimer(duration: Duration) {
             binding.view.setBackgroundResource(R.drawable.used_color)
             val hours = duration.toHours()
             val minutes = (duration.toMinutes() % 60)
             val seconds = (duration.seconds % 60)
             binding.remainTimeTxt.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
-            runnable?.let{handler.postDelayed(it, 1000)}
+            Log.d("mine", String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds))
+
         }
 
-        private fun onTimerEnd(selectLaundry: Laundry, laundryType : String){
+        private fun onTimerEnd(selectLaundry: Laundry, laundryType: String) {
             binding.remainTimeTxt.text = "사용자 없음"
             binding.view.setBackgroundResource(R.drawable.null_color)
-            runnable?.let { handler.removeCallbacks(it) }
-            when{
+            timerStop()  // 타이머 정지
+
+            when {
                 laundryType.contains("세탁기") -> UserInfo.useLaundry = null
                 laundryType.contains("건조기") -> UserInfo.useDry = null
             }
+
             selectLaundry.endTime = null
             selectLaundry.userId = null
         }
     }
 
-    override fun getItemCount(): Int {
-        return laundryLst.size
-    }
+    override fun getItemCount(): Int = laundryLst.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LaundryViewHolder {
         val binding = ItemLaundryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        // 뷰의 높이를 너비와 동일하게 설정
+        // 뷰 크기 조정
         binding.view.viewTreeObserver.addOnGlobalLayoutListener {
             val width = binding.view.width
             binding.view.layoutParams.height = width
             binding.view.requestLayout()
         }
 
-        return LaundryViewHolder(binding)
+        // 생성된 뷰홀더를 리스트에 추가
+        val holder = LaundryViewHolder(binding)
+        viewHolders.add(holder)
+
+        return holder
     }
 
+    // 깔끔하게 만드는 거 합시다.
     @RequiresApi(VERSION_CODES.O)
     override fun onBindViewHolder(holder: LaundryViewHolder, position: Int) {
         val binding = holder.binding
@@ -96,13 +131,17 @@ class LaundryAdapter(private val laundryLst: ArrayList<Laundry>, private val onI
             it.roomId == laundry.roomId && it.laundryId == laundry.laundryId
         }
 
-        if (laundry.endTime != null) {
-            holder.timerStart(laundry.endTime!!, ListData.laundryLst[pos])
+        if (laundry.endTime != null ) {
+            if(holder.runnable == null){
+                holder.timerStart(ListData.laundryLst[pos])
+            } else{
+                holder.timerStop()// 타이머 시작
+            }
         } else {
             binding.view.setBackgroundResource(R.drawable.null_color)
         }
 
-        binding.laundTitle.setText(laundry.name)
+        binding.laundTitle.text = laundry.name
 
         binding.view.setOnClickListener { view ->
             handleLaundryClick(view, laundry, pos, holder)
@@ -113,50 +152,51 @@ class LaundryAdapter(private val laundryLst: ArrayList<Laundry>, private val onI
     private fun handleLaundryClick(view: View, laundry: Laundry, pos: Int, holder: LaundryViewHolder) {
         val binding = holder.binding
 
-        if (isUsedLaundry(view, laundry, binding) == true) return
+        if (isUsedLaundry(view, laundry, binding)) return
 
         if (pos != -1) {
             val selectLaundry = ListData.laundryLst[pos]
             updateUserAndEndTime(selectLaundry)
 
             // 사용자 정보 업데이트
-            when{
-                selectLaundry.name.contains("세탁기") ->UserInfo.useLaundry = selectLaundry
-                selectLaundry.name.contains("건조기") ->UserInfo.useDry = selectLaundry
+            when {
+                selectLaundry.name.contains("세탁기") -> UserInfo.useLaundry = selectLaundry
+                selectLaundry.name.contains("건조기") -> UserInfo.useDry = selectLaundry
             }
 
-            holder.timerStart(selectLaundry.endTime!!, selectLaundry)
+            onItemClick(selectLaundry)
+            holder.timerStart(selectLaundry)  // 타이머 시작
         }
     }
 
-    private fun isUsedLaundry(view : View, laundry: Laundry, binding: ItemLaundryBinding):Boolean{
-        when {
+    private fun isUsedLaundry(view: View, laundry: Laundry, binding: ItemLaundryBinding): Boolean {
+        val context = view.context
+
+        return when {
             laundry.userId != null -> {
-                Toast.makeText(view.context, "이미 사용중인 유저가 있습니다", Toast.LENGTH_SHORT).show()
-                return true
+                Toast.makeText(context, "이미 사용중인 유저가 있습니다", Toast.LENGTH_SHORT).show()
+                true
             }
-
             binding.laundTitle.text.contains("세탁기") && UserInfo.useLaundry != null -> {
-                Toast.makeText(view.context, "이미 사용중인 세탁기가 있습니다", Toast.LENGTH_SHORT).show()
-                return true
+                Toast.makeText(context, "이미 사용중인 세탁기가 있습니다", Toast.LENGTH_SHORT).show()
+                true
             }
-
             binding.laundTitle.text.contains("건조기") && UserInfo.useDry != null -> {
-                Toast.makeText(view.context, "이미 사용중인 건조기가 있습니다", Toast.LENGTH_SHORT).show()
-                return true
+                Toast.makeText(context, "이미 사용중인 건조기가 있습니다", Toast.LENGTH_SHORT).show()
+                true
             }
-             else -> return false
+            else -> false
         }
     }
 
     @RequiresApi(VERSION_CODES.O)
     private fun updateUserAndEndTime(selectLaundry: Laundry) {
-        selectLaundry.endTime = LocalDateTime.of(2024, 10, 16, 14, 42, 30)
+        // 현재 시간에 사용자 지정 초를 더하는 방식으로 설정
+        selectLaundry.endTime = LocalDateTime.now().plusSeconds(UserInfo.seconds.toLong())
         selectLaundry.userId = UserInfo.userId
     }
 
-    override fun onViewRecycled(holder: LaundryViewHolder) {
-        super.onViewRecycled(holder)
-        holder.timerStop()
+    fun stopAllTimers() {
+        viewHolders.forEach { it.timerStop() }
     }
 }

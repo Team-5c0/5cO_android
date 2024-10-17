@@ -1,5 +1,7 @@
 package com.example.mywiselaundrylife.serve
 
+import com.example.mywiselaundrylife.data.Laundry
+
 interface OnItemClickListener {
-    fun onItemClicked(itemName: String)
+    fun onItemClicked(selectLaundry : Laundry)
 }
