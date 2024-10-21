@@ -33,17 +33,11 @@ class LaundryAdapter(
             // 이전 타이머 정지
             timerStop()
 
-            // endTime이 null인지 체크
-            if (selectLaundry.endTime == null) {
-                binding.remainTimeTxt.text = "사용자 없음"
-                return  // early return
-            }
-
             runnable = object : Runnable {
                 @RequiresApi(VERSION_CODES.O)
                 override fun run() {
                     try {
-                        val now = LocalDateTime.now()
+                        val now = LocalDateTime.now().withNano(0)
 
                         // endTime이 null인지 확인
                         if (selectLaundry.endTime == null) {
@@ -144,12 +138,12 @@ class LaundryAdapter(
         binding.laundTitle.text = laundry.name
 
         binding.view.setOnClickListener { view ->
-            handleLaundryClick(view, laundry, pos, holder)
+            laundryClick(view, laundry, pos, holder)
         }
     }
 
     @RequiresApi(VERSION_CODES.O)
-    private fun handleLaundryClick(view: View, laundry: Laundry, pos: Int, holder: LaundryViewHolder) {
+    private fun laundryClick(view: View, laundry: Laundry, pos: Int, holder: LaundryViewHolder) {
         val binding = holder.binding
 
         if (isUsedLaundry(view, laundry, binding)) return
@@ -165,7 +159,7 @@ class LaundryAdapter(
             }
 
             onItemClick(selectLaundry)
-            holder.timerStart(selectLaundry)  // 타이머 시작
+            holder.timerStart(selectLaundry) // 타이머 시작
         }
     }
 
@@ -192,8 +186,13 @@ class LaundryAdapter(
     @RequiresApi(VERSION_CODES.O)
     private fun updateUserAndEndTime(selectLaundry: Laundry) {
         // 현재 시간에 사용자 지정 초를 더하는 방식으로 설정
-        selectLaundry.endTime = LocalDateTime.now().plusSeconds(UserInfo.seconds.toLong())
+        selectLaundry.endTime = LocalDateTime.now().withNano(0).plusSeconds(UserInfo.seconds.toLong())
         selectLaundry.userId = UserInfo.userId
+    }
+
+    override fun onViewRecycled(holder: LaundryViewHolder) {
+        super.onViewRecycled(holder)
+        holder.timerStop()  // 뷰홀더가 재활용될 때 타이머 정지
     }
 
     fun stopAllTimers() {

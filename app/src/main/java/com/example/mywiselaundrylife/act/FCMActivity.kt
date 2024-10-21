@@ -4,7 +4,10 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -20,12 +23,17 @@ import com.example.mywiselaundrylife.frag.FragMain
 import com.example.mywiselaundrylife.serve.OnItemClickListener
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import java.time.Duration
+import java.time.LocalDateTime
 
 class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
     private var backPressedTime: Long = 0
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityMainBinding
+    private val handler = Handler(Looper.getMainLooper())
+    var runnableLaundry : Runnable? = null
+    var runnableDryer : Runnable? = null
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 5000
@@ -38,16 +46,11 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val usingLandry = ListData.laundryLst.indexOfFirst { it.userId == UserInfo.userId && it.name.contains("세탁기") }
-        val usingDryer = ListData.laundryLst.indexOfFirst { it.userId == UserInfo.userId && it.name.contains("건조기") }
-
-        when{
-            (usingLandry != -1) ->{
-                Toast.makeText(this, "startTime세탁기", Toast.LENGTH_SHORT).show()
-            }
-            (usingDryer != -1) ->{
-                Toast.makeText(this, "startTime건조기", Toast.LENGTH_SHORT).show()
-            }
+        if (UserInfo.useLaundry != null) {
+            startTimer(UserInfo.useLaundry!!)
+        }
+        if (UserInfo.useDry != null){
+            startTimer(UserInfo.useDry!!)
         }
 
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
@@ -71,13 +74,128 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     // 인터페이스 구현: 아이템 클릭 시 TextView 업데이트
-    override fun onItemClicked(item : Laundry) {
-        if("세탁기" in item.name){
-            binding.laundryTime.text = item.endTime.toString() // TextView 업데이트
-        } else{
-            binding.dryerTime.text = item.endTime.toString()  // TextView 업데이트
-        }
+    override fun onItemClicked(item : Laundry) { // startTimer
+        startTimer(item)  // TextView 업데이트
         Toast.makeText(this, "${item.name} 선택됨", Toast.LENGTH_SHORT).show()
+    }
+
+
+    fun startTimer(selectLaundry : Laundry){
+        when(selectLaundry.name){
+            "세탁기" -> startLaundry(selectLaundry)
+            "건조기" -> startDryer(selectLaundry)
+        }
+    }
+
+    fun startLaundry(selectLaundry: Laundry){
+        timerStop(selectLaundry)
+        @RequiresApi(VERSION_CODES.O)
+        runnableLaundry = object : Runnable{
+            override fun run() {
+                try {
+                    val now = LocalDateTime.now()
+
+                    // endTime이 null인지 확인
+                    if (selectLaundry.endTime == null) {
+                        binding.laundryTime.text = "사용자 없음"
+                        timerStop(selectLaundry)
+                        return
+                    }
+
+                    val duration = Duration.between(now, selectLaundry.endTime)
+
+                    // 시간이 종료된 경우
+                    if (duration.isNegative || duration.isZero) {
+                        onTimerEnd(selectLaundry, selectLaundry.name)
+                    } else {
+                        updateTimer(selectLaundry, duration)  // 타이머 업데이트
+                        handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
+                    }
+                } catch (e: Exception) {
+                    Log.e("mine", "Error in timer: ${e.message}")
+                }
+            }
+        }
+        handler.post(runnableLaundry!!)
+    }
+
+    fun startDryer(selectLaundry: Laundry){
+        timerStop(selectLaundry)
+        runnableDryer = object : Runnable{
+            @RequiresApi(VERSION_CODES.O)
+            override fun run() {
+                try {
+                    val now = LocalDateTime.now().withNano(0)
+
+                    // endTime이 null인지 확인
+                    if (selectLaundry.endTime == null) {
+                        binding.dryerTime.text = "없음"
+                        timerStop(selectLaundry)
+                        return
+                    }
+
+                    val duration = Duration.between(now, selectLaundry.endTime)
+
+                    // 시간이 종료된 경우
+                    if (duration.isNegative || duration.isZero) {
+                        onTimerEnd(selectLaundry, selectLaundry.name)
+                    } else {
+                        updateTimer(selectLaundry, duration)  // 타이머 업데이트
+                        handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
+                    }
+                } catch (e: Exception) {
+                    Log.e("mine", "Error in timer: ${e.message}")
+                }
+            }
+        }
+        handler.post(runnableDryer!!)
+    }
+
+    fun timerStop(selectLaundry: Laundry){
+        when(selectLaundry.name){
+            "세탁기" -> {
+                runnableLaundry?.let{
+                    handler.removeCallbacks(it)
+                    runnableLaundry = null
+                }
+            }
+            "건조기" -> {
+                runnableDryer?.let{
+                    handler.removeCallbacks(it)
+                    runnableDryer = null
+                }
+            }
+        }
+    }
+
+    @RequiresApi(VERSION_CODES.O)
+    private fun updateTimer(selectLaundry: Laundry, duration: Duration) {
+        val hours = duration.toHours()
+        val minutes = (duration.toMinutes() % 60)
+        val seconds = (duration.seconds % 60)
+
+        when (selectLaundry.name) {
+            "세탁기" -> binding.laundryTime.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
+            "건조기" -> binding.dryerTime.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
+        }
+    }
+
+    private fun onTimerEnd(selectLaundry: Laundry, laundryType: String) {
+        timerStop(selectLaundry)  // 타이머 정지
+
+        when(laundryType) {
+            "세탁기" ->{
+                UserInfo.useLaundry = null
+                binding.laundryTime.setText("없음")
+            }
+            "건조기" -> {
+                UserInfo.useDry = null
+                binding.dryerTime.setText("없음")
+            }
+        }
+
+        selectLaundry.endTime = null
+        selectLaundry.userId = null
     }
 
     override fun onBackPressed() {
@@ -92,10 +210,6 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         }
         backPressedTime = System.currentTimeMillis()
     }
-
-
-
-
 
     // FireBase
     override fun onRequestPermissionsResult(
