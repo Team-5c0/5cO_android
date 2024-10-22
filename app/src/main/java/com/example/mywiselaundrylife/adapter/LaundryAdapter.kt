@@ -11,9 +11,9 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mywiselaundrylife.R
-import com.example.mywiselaundrylife.data.Laundry
 import com.example.mywiselaundrylife.data.ListData
 import com.example.mywiselaundrylife.data.UserInfo
+import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.databinding.ItemLaundryBinding
 import java.time.Duration
 import java.time.LocalDateTime
@@ -47,11 +47,11 @@ class LaundryAdapter(
                             return
                         }
 
-                        val duration = Duration.between(now, selectLaundry.endTime)
+                        val duration = Duration.between(now, LocalDateTime.parse(selectLaundry.endTime))
 
                         // 시간이 종료된 경우
                         if (duration.isNegative || duration.isZero) {
-                            onTimerEnd(selectLaundry, selectLaundry.name)
+                            onTimerEnd(selectLaundry, selectLaundry.washerType)
                         } else {
                             updateTimer(duration)  // 타이머 업데이트
                             handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
@@ -87,13 +87,15 @@ class LaundryAdapter(
             binding.view.setBackgroundResource(R.drawable.null_color)
             timerStop()  // 타이머 정지
 
-            when {
-                laundryType.contains("세탁기") -> UserInfo.useLaundry = null
-                laundryType.contains("건조기") -> UserInfo.useDry = null
+            if(selectLaundry.user == UserInfo.userId){
+                when {
+                    laundryType.contains("WASHER") -> UserInfo.useLaundry = null
+                    laundryType.contains("DRYER") -> UserInfo.useDry = null
+                }
             }
 
             selectLaundry.endTime = null
-            selectLaundry.userId = null
+            selectLaundry.user = null
         }
     }
 
@@ -116,16 +118,16 @@ class LaundryAdapter(
         return holder
     }
 
-    // 깔끔하게 만드는 거 합시다.
     @RequiresApi(VERSION_CODES.O)
     override fun onBindViewHolder(holder: LaundryViewHolder, position: Int) {
         val binding = holder.binding
         val laundry = laundryLst[position]
         val pos = ListData.laundryLst.indexOfFirst {
-            it.roomId == laundry.roomId && it.laundryId == laundry.laundryId
+            it.roomId == laundry.roomId && it.washerId == laundry.washerId
         }
 
-        if (laundry.endTime != null ) {
+        if (laundry.available == false) {
+            binding.view.setBackgroundResource(R.drawable.used_color)
             if(holder.runnable == null){
                 holder.timerStart(ListData.laundryLst[pos])
             } else{
@@ -135,7 +137,7 @@ class LaundryAdapter(
             binding.view.setBackgroundResource(R.drawable.null_color)
         }
 
-        binding.laundTitle.text = laundry.name
+        binding.laundTitle.text = laundry.washerType
 
         binding.view.setOnClickListener { view ->
             laundryClick(view, laundry, pos, holder)
@@ -154,8 +156,8 @@ class LaundryAdapter(
 
             // 사용자 정보 업데이트
             when {
-                selectLaundry.name.contains("세탁기") -> UserInfo.useLaundry = selectLaundry
-                selectLaundry.name.contains("건조기") -> UserInfo.useDry = selectLaundry
+                selectLaundry.washerType.contains("WASHER") -> UserInfo.useLaundry = selectLaundry
+                selectLaundry.washerType.contains("DRYER") -> UserInfo.useDry = selectLaundry
             }
 
             onItemClick(selectLaundry)
@@ -167,15 +169,15 @@ class LaundryAdapter(
         val context = view.context
 
         return when {
-            laundry.userId != null -> {
+            laundry.user != null -> {
                 Toast.makeText(context, "이미 사용중인 유저가 있습니다", Toast.LENGTH_SHORT).show()
                 true
             }
-            binding.laundTitle.text.contains("세탁기") && UserInfo.useLaundry != null -> {
+            binding.laundTitle.text.contains("WASHER") && UserInfo.useLaundry != null -> {
                 Toast.makeText(context, "이미 사용중인 세탁기가 있습니다", Toast.LENGTH_SHORT).show()
                 true
             }
-            binding.laundTitle.text.contains("건조기") && UserInfo.useDry != null -> {
+            binding.laundTitle.text.contains("DRYER") && UserInfo.useDry != null -> {
                 Toast.makeText(context, "이미 사용중인 건조기가 있습니다", Toast.LENGTH_SHORT).show()
                 true
             }
@@ -186,8 +188,9 @@ class LaundryAdapter(
     @RequiresApi(VERSION_CODES.O)
     private fun updateUserAndEndTime(selectLaundry: Laundry) {
         // 현재 시간에 사용자 지정 초를 더하는 방식으로 설정
-        selectLaundry.endTime = LocalDateTime.now().withNano(0).plusSeconds(UserInfo.seconds.toLong())
-        selectLaundry.userId = UserInfo.userId
+        selectLaundry.endTime = LocalDateTime.now().withNano(0).plusSeconds(UserInfo.seconds.toLong()).toString()
+        selectLaundry.available = false
+        selectLaundry.user = UserInfo.userId
     }
 
     override fun onViewRecycled(holder: LaundryViewHolder) {

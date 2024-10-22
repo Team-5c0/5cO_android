@@ -11,9 +11,9 @@ import com.example.mywiselaundrylife.serve.OnItemClickListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mywiselaundrylife.adapter.LaundryAdapter
-import com.example.mywiselaundrylife.data.Laundry
 import com.example.mywiselaundrylife.data.ListData
 import com.example.mywiselaundrylife.data.UserInfo
+import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.databinding.FragmentLaundryBinding
 
 class FragInRoom : Fragment() {
@@ -48,7 +48,7 @@ class FragInRoom : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setRecyclerView() {
         UserInfo.userLaundryLst = ListData.laundryLst.filter {
-            it.roomId == UserInfo.currentRoom?.roomId
+            it.roomId == UserInfo.currentRoom
         } as ArrayList<Laundry>
 
         binding.recyclerview.layoutManager = GridLayoutManager(context, 2)
@@ -60,7 +60,7 @@ class FragInRoom : Fragment() {
 
         binding.recyclerview.adapter = laundryAdapter
 
-        binding.currentRoom.text = "현재 세탁실 : ${UserInfo.currentRoom?.roomName ?: "알 수 없음"}"
+        binding.currentRoom.text = "현재 세탁실 : ${UserInfo.currentRoom?: "알 수 없음"}"
     }
 
     override fun onDetach() {

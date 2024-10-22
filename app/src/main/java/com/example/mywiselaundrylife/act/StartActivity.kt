@@ -2,15 +2,18 @@ package com.example.mywiselaundrylife.act
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.mywiselaundrylife.data.LaundryRequestMananger
+import com.example.mywiselaundrylife.data.ListData
 import com.example.mywiselaundrylife.data.UserInfo
 import com.example.mywiselaundrylife.data.auth.AuthRequestManager
-import com.example.mywiselaundrylife.data.auth.LoginRequest
+import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.databinding.ActivityStartBinding
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
@@ -21,6 +24,7 @@ class StartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStartBinding
     private val inputRegex: Pattern = Pattern.compile("[1-3][1-4][0-1][0-9]")
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStartBinding.inflate(layoutInflater)
@@ -45,6 +49,7 @@ class StartActivity : AppCompatActivity() {
 //                }
                 else->{
                     loginRequest()
+                    roomRequest()
                 }
             }
         }
@@ -56,17 +61,64 @@ class StartActivity : AppCompatActivity() {
                 // sharedPreference 편집
                 val editor = sharedPreferences.edit()
 
-                val response = AuthRequestManager.loginRequest(binding.inputId.text.toString().toInt())
+                val loginResponse = AuthRequestManager.loginRequest(binding.inputId.text.toString().toInt())
 
-                UserInfo.token = response.body()?.token
+                UserInfo.token = loginResponse.body()?.token
                 UserInfo.userId = binding.inputId.text.toString().toInt()
 
                 editor.putInt("myId", binding.inputId.text.toString().toInt())
-                editor.putString("myToken", response.body()?.token)
+                editor.putString("myToken", loginResponse.body()?.token)
                 editor.putBoolean("isLogin", true)
                 editor.apply()
 
                 binding.errorText.visibility = View.GONE
+
+            } catch (e : retrofit2.HttpException){
+                Log.e("mine", "${e.message}")
+                showError("잘못된 번호입니다.")
+            } catch (e : Exception){
+                Log.e("mine", "${e.message}")
+                showError("대부분 버그이무니다")
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun roomRequest(){
+        lifecycleScope.launch {
+            try {
+
+                val roomResponse = LaundryRequestMananger.roomsRequest()
+                ListData.roomLst = roomResponse!!
+                Log.d("mine", "${ListData.roomLst}")
+
+                ListData.laundryLst = ArrayList()
+                for(i in ListData.roomLst){
+                    washerRequest(i.roomid)
+                }
+
+            } catch (e : retrofit2.HttpException){
+                Log.e("mine", "${e.message}")
+                showError("잘못된 번호입니다.")
+            } catch (e : Exception){
+                Log.e("mine", "${e.message}")
+                showError("대부분 버그이무니다")
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun washerRequest(roomId : Int){
+        lifecycleScope.launch {
+            try {
+
+                val washerResponse = LaundryRequestMananger.laundryRequest(roomId)
+                ListData.laundryLst = ArrayList(ListData.laundryLst + washerResponse!!)
+                for(i in ListData.laundryLst){
+                    i.roomId = roomId
+                }
+                Log.d("mine", "${ListData.laundryLst}")
+
                 startMainActivity()
 
             } catch (e : retrofit2.HttpException){
@@ -80,7 +132,7 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun showError(msg : String){
-        binding.errorText.text =msg
+        binding.errorText.text = msg
         binding.errorText.visibility = View.VISIBLE
     }
 

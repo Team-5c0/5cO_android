@@ -1,6 +1,6 @@
 package com.example.mywiselaundrylife.data
 
-import android.media.session.MediaSession
+import com.example.mywiselaundrylife.data.base.Laundry
 
 object UserInfo {
     var userId : Int? = null
@@ -10,7 +10,7 @@ object UserInfo {
     var token : String? = null
 
     var userLaundryLst = arrayListOf<Laundry>()
-    var currentRoom : LaundryRoom? = null
+    var currentRoom : Int = 0
 
     var seconds = 20
 }

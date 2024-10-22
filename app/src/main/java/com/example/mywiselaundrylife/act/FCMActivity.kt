@@ -15,9 +15,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.mywiselaundrylife.R
-import com.example.mywiselaundrylife.data.Laundry
-import com.example.mywiselaundrylife.data.ListData
 import com.example.mywiselaundrylife.data.UserInfo
+import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
 import com.example.mywiselaundrylife.frag.FragMain
 import com.example.mywiselaundrylife.serve.OnItemClickListener
@@ -76,14 +75,14 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     // 인터페이스 구현: 아이템 클릭 시 TextView 업데이트
     override fun onItemClicked(item : Laundry) { // startTimer
         startTimer(item)  // TextView 업데이트
-        Toast.makeText(this, "${item.name} 선택됨", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "${item.washerType} 선택됨", Toast.LENGTH_SHORT).show()
     }
 
 
     fun startTimer(selectLaundry : Laundry){
-        when(selectLaundry.name){
-            "세탁기" -> startLaundry(selectLaundry)
-            "건조기" -> startDryer(selectLaundry)
+        when(selectLaundry.washerType){
+            "WASHER" -> startLaundry(selectLaundry)
+            "DRYER" -> startDryer(selectLaundry)
         }
     }
 
@@ -102,11 +101,11 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
                         return
                     }
 
-                    val duration = Duration.between(now, selectLaundry.endTime)
+                    val duration = Duration.between(now, LocalDateTime.parse(selectLaundry.endTime))
 
                     // 시간이 종료된 경우
                     if (duration.isNegative || duration.isZero) {
-                        onTimerEnd(selectLaundry, selectLaundry.name)
+                        onTimerEnd(selectLaundry, selectLaundry.washerType)
                     } else {
                         updateTimer(selectLaundry, duration)  // 타이머 업데이트
                         handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
@@ -134,11 +133,11 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
                         return
                     }
 
-                    val duration = Duration.between(now, selectLaundry.endTime)
+                    val duration = Duration.between(now, LocalDateTime.parse(selectLaundry.endTime))
 
                     // 시간이 종료된 경우
                     if (duration.isNegative || duration.isZero) {
-                        onTimerEnd(selectLaundry, selectLaundry.name)
+                        onTimerEnd(selectLaundry, selectLaundry.washerType)
                     } else {
                         updateTimer(selectLaundry, duration)  // 타이머 업데이트
                         handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
@@ -152,14 +151,14 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     fun timerStop(selectLaundry: Laundry){
-        when(selectLaundry.name){
-            "세탁기" -> {
+        when(selectLaundry.washerType){
+            "WASHER" -> {
                 runnableLaundry?.let{
                     handler.removeCallbacks(it)
                     runnableLaundry = null
                 }
             }
-            "건조기" -> {
+            "DRYER" -> {
                 runnableDryer?.let{
                     handler.removeCallbacks(it)
                     runnableDryer = null
@@ -174,9 +173,9 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         val minutes = (duration.toMinutes() % 60)
         val seconds = (duration.seconds % 60)
 
-        when (selectLaundry.name) {
-            "세탁기" -> binding.laundryTime.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
-            "건조기" -> binding.dryerTime.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
+        when (selectLaundry.washerType) {
+            "WASHER" -> binding.laundryTime.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
+            "DRYER" -> binding.dryerTime.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
         }
     }
 
@@ -184,18 +183,18 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         timerStop(selectLaundry)  // 타이머 정지
 
         when(laundryType) {
-            "세탁기" ->{
+            "WASHER" ->{
                 UserInfo.useLaundry = null
                 binding.laundryTime.setText("없음")
             }
-            "건조기" -> {
+            "DRYER" -> {
                 UserInfo.useDry = null
                 binding.dryerTime.setText("없음")
             }
         }
 
         selectLaundry.endTime = null
-        selectLaundry.userId = null
+        selectLaundry.user = null
     }
 
     override fun onBackPressed() {

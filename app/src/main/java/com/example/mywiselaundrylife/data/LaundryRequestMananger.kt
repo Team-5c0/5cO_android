@@ -1,11 +1,9 @@
 package com.example.mywiselaundrylife.data
 
 import android.util.Log
-import com.example.mywiselaundrylife.data.auth.AuthService
-import com.example.mywiselaundrylife.data.base.LoginResponse
-import com.example.mywiselaundrylife.data.base.RoomsResponse
+import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.base.Room
 import okhttp3.OkHttpClient
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -25,12 +23,24 @@ object LaundryRequestMananger {
 
     private val laundryService : LaundryService = retrofit.create(LaundryService::class.java)
 
-    suspend fun roomsRequest() : Response<RoomsResponse> {
+    suspend fun roomsRequest(): ArrayList<Room>? {
         val response = laundryService.getRooms()
         Log.d("response", "$response")
-        if (!response.isSuccessful){
+        if (response.isSuccessful) {
+            return response.body() // List<Rooms>를 반환
+        } else {
             throw retrofit2.HttpException(response)
         }
-        return response
     }
+
+    suspend fun laundryRequest(roomId : Int): ArrayList<Laundry>? {
+        val response = laundryService.getWashers(roomId)
+        Log.d("response", "$response")
+        if (response.isSuccessful) {
+            return response.body() // List<Rooms>를 반환
+        } else {
+            throw retrofit2.HttpException(response)
+        }
+    }
+
 }
