@@ -10,7 +10,7 @@ object UserInfo {
     var token : String? = null
 
     var userLaundryLst = arrayListOf<Laundry>()
-    var currentRoom : Int = 0
+    var currentRoom : String = ""
 
     var seconds = 20
 }

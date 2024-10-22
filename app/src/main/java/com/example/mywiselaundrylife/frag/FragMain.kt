@@ -35,7 +35,7 @@ class FragMain : Fragment() {
             LaundryRoomAdapter(ListData.roomLst) { Room -> goToRoom(Room.roomid) }
     }
 
-    private fun goToRoom(roomId: Int) {
+    private fun goToRoom(roomId: String) {
         UserInfo.currentRoom = roomId
         parentFragmentManager.beginTransaction()
             .replace(R.id.frame, FragInRoom())

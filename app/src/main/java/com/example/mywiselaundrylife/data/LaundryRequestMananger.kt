@@ -33,7 +33,7 @@ object LaundryRequestMananger {
         }
     }
 
-    suspend fun laundryRequest(roomId : Int): ArrayList<Laundry>? {
+    suspend fun laundryRequest(roomId : String): ArrayList<Laundry>? {
         val response = laundryService.getWashers(roomId)
         Log.d("response", "$response")
         if (response.isSuccessful) {

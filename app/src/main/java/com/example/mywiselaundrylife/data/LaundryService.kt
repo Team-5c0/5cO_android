@@ -12,6 +12,6 @@ interface LaundryService {
 
     @GET("/wash/washers")
     suspend fun getWashers(
-        @Query("roomId") roomId : Int
+        @Query("Loc") roomId : String
     ) : Response<ArrayList<Laundry>>
 }

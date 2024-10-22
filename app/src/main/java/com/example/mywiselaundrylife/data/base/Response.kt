@@ -8,7 +8,7 @@ data class LoginResponse(
 )
 
 data class Room(
-    val roomid : Int
+    val roomid : String
 )
 
 data class Laundry(
@@ -18,5 +18,5 @@ data class Laundry(
     var endTime : String?,
     var user : Int?,
     val washerType : String,
-    var roomId : Int? = null
+    var roomId : String? = null
 )
