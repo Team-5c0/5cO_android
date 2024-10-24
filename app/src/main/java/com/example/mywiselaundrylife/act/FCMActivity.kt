@@ -234,7 +234,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
             }
             val token = task.result
             val msg = "FCM Registration token: $token"
-            Log.d(TAG, msg)
+            Log.d("mine", msg)
             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
         })
     }

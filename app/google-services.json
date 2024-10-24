@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "960348475596",
-    "project_id": "textalarm",
-    "storage_bucket": "textalarm.appspot.com"
+    "project_number": "192782972709",
+    "project_id": "c0-firebase",
+    "storage_bucket": "c0-firebase.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:960348475596:android:3e0d7ec8746ca94c5c7269",
+        "mobilesdk_app_id": "1:192782972709:android:a650a81d6ba2007071cccc",
         "android_client_info": {
           "package_name": "com.example.mywiselaundrylife"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAUzluK3vkRpTdn77ao51mxPalD7k6pR1s"
+          "current_key": "AIzaSyB_4u0QV4FIAPY0_n9_IVkmDUSJKh0sr2E"
         }
       ],
       "services": {
