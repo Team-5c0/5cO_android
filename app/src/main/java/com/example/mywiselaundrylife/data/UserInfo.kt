@@ -8,6 +8,7 @@ object UserInfo {
     var useDry : Laundry? = null
 
     var token : String? = null
+    var FCMtoken : String? = null
 
     var userLaundryLst = arrayListOf<Laundry>()
     var currentRoom : String = ""

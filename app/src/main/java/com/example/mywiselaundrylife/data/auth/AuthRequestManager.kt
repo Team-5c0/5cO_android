@@ -1,6 +1,7 @@
 package com.example.mywiselaundrylife.data.auth
 
 import android.util.Log
+import com.example.mywiselaundrylife.data.base.FCMResponse
 import com.example.mywiselaundrylife.data.base.LoginResponse
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -25,6 +26,15 @@ object AuthRequestManager {
 
     suspend fun loginRequest(userId : Int) : Response<LoginResponse>{
         val response = authService.login(userId)
+        Log.d("response", "$response")
+        if (!response.isSuccessful){
+            throw retrofit2.HttpException(response)
+        }
+        return response
+    }
+
+    suspend fun fcmTokenRequest(userId: Int, fcmToken : String) : Response<FCMResponse>{
+        val response = authService.fcmToken(userId, fcmToken)
         Log.d("response", "$response")
         if (!response.isSuccessful){
             throw retrofit2.HttpException(response)

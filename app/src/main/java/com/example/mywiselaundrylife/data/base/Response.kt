@@ -11,6 +11,11 @@ data class Room(
     val roomid : String
 )
 
+data class FCMResponse(
+    val userId : Int,
+    val fcmToken : String
+)
+
 data class Laundry(
     var available : Boolean,
     val washerId : Int,

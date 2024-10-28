@@ -42,7 +42,7 @@ class LaundryAdapter(
                         // endTime이 null인지 확인
                         if (selectLaundry.endTime == null) {
                             binding.remainTimeTxt.text = "사용자 없음"
-//                            binding.view.setBackgroundResource(R.drawable.null_color)
+                            binding.view.setBackgroundResource(R.drawable.null_color)
                             timerStop()
                             return
                         }
@@ -84,7 +84,7 @@ class LaundryAdapter(
 
         private fun onTimerEnd(selectLaundry: Laundry, laundryType: String) {
             binding.remainTimeTxt.text = "사용자 없음"
-//            binding.view.setBackgroundResource(R.drawable.null_color)
+            binding.view.setBackgroundResource(R.drawable.null_color)
             timerStop()  // 타이머 정지
 
             if(selectLaundry.user == UserInfo.userId){
@@ -127,14 +127,14 @@ class LaundryAdapter(
         }
 
         if (laundry.available == false) {
-//            binding.view.setBackgroundResource(R.drawable.used_color)
+            binding.view.setBackgroundResource(R.drawable.used_color)
             if(holder.runnable == null){
                 holder.timerStart(ListData.laundryLst[pos])
             } else{
                 holder.timerStop()// 타이머 시작
             }
         } else {
-//            binding.view.setBackgroundResource(R.drawable.null_color)
+            binding.view.setBackgroundResource(R.drawable.null_color)
         }
 
         binding.laundTitle.text = laundry.washerType
