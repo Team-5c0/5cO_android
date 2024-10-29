@@ -101,7 +101,10 @@ class StartActivity : AppCompatActivity() {
                 val roomResponse = LaundryRequestMananger.roomsRequest()
                 ListData.roomLst = roomResponse!!
 
+                Log.d("room", "${ListData.roomLst}")
+
                 ListData.laundryLst = ArrayList()
+
                 for(i in ListData.roomLst){
                     washerRequest(i.roomid)
                 }
@@ -121,10 +124,16 @@ class StartActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val washerResponse = LaundryRequestMananger.laundryRequest(roomId)
-                ListData.laundryLst = ArrayList(ListData.laundryLst + washerResponse!!)
-                for(i in ListData.laundryLst){
+                for(i in washerResponse!!){
                     i.roomId = roomId
+                    if(i.user == UserInfo.userId){
+                        when(i.washerType){
+                            "WASHER" -> UserInfo.useLaundry = i
+                            "DRYER" -> UserInfo.useDry = i
+                        }
+                    }
                 }
+                ListData.laundryLst = ArrayList(ListData.laundryLst + washerResponse)
                 Log.d("mine", "${ListData.laundryLst}")
 
                 fcmTokenRequest(UserInfo.userId!!, UserInfo.FCMtoken!!)

@@ -31,33 +31,43 @@ class LaundryAdapter(
 
         fun timerStart(selectLaundry: Laundry) {
             // 이전 타이머 정지
+            Log.d("timer", "${selectLaundry}")
             timerStop()
 
             runnable = object : Runnable {
                 @RequiresApi(VERSION_CODES.O)
                 override fun run() {
+                    Log.d("timer", "run")
                     try {
-                        val now = LocalDateTime.now().withNano(0)
+                        val currentTime = LocalDateTime.now().withNano(0)
 
                         // endTime이 null인지 확인
                         if (selectLaundry.endTime == null) {
+                            Log.d("timer", "${selectLaundry.endTime}")
                             binding.remainTimeTxt.text = "사용자 없음"
                             binding.view.setBackgroundResource(R.drawable.null_color)
                             timerStop()
                             return
                         }
 
-                        val duration = Duration.between(now, LocalDateTime.parse(selectLaundry.endTime))
+                        val startTime = LocalDateTime.parse(selectLaundry.startTime)
+                        val endTime = LocalDateTime.parse(selectLaundry.endTime)
+
+                        val duration = Duration.between(currentTime, endTime)
+                        val elapsedDuration = Duration.between(startTime, currentTime).toMillis()
+                        val totalDuration = Duration.between(startTime, endTime).toMillis()
 
                         // 시간이 종료된 경우
                         if (duration.isNegative || duration.isZero) {
+                            Log.d("timer", "onTimerEnd")
                             onTimerEnd(selectLaundry, selectLaundry.washerType)
                         } else {
-                            updateTimer(duration)  // 타이머 업데이트
+                            Log.d("timer", "update")
+                            updateTimer(duration, elapsedDuration, totalDuration)  // 타이머 업데이트
                             handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
                         }
                     } catch (e: Exception) {
-                        Log.e("mine", "Error in timer: ${e.message}")
+                        Log.e("timer", "Error in timer: ${e.message}")
                     }
                 }
             }
@@ -65,19 +75,25 @@ class LaundryAdapter(
         }
 
         fun timerStop() {
-            if(runnable != null){
-                handler.removeCallbacks(runnable!!)  // 핸들러에서 runnable 제거
+            runnable?.let {
+                handler.removeCallbacks(it)
+                binding?.prgBar?.progress = 0  // binding이 null이 아닌 경우에만 설정
             }
-            runnable = null  // runnable 초기화
+            runnable = null
         }
 
+
         @RequiresApi(VERSION_CODES.O)
-        private fun updateTimer(duration: Duration) {
-//            binding.view.setBackgroundResource(R.drawable.used_color)
+        private fun updateTimer(duration: Duration, elapsedDuration: Long, totalDuration: Long) {
+            binding.view.setBackgroundResource(R.drawable.used_color)
+            val progress = ((elapsedDuration.toDouble() / totalDuration) * 1000).toInt().coerceIn(0, 1000)
             val hours = duration.toHours()
             val minutes = (duration.toMinutes() % 60)
             val seconds = (duration.seconds % 60)
+            binding.prgBar.progress = progress
             binding.remainTimeTxt.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
+
+            Log.d("progress", "${binding.prgBar.progress}")
             Log.d("mine", String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds))
 
         }
@@ -93,7 +109,6 @@ class LaundryAdapter(
                     laundryType.contains("DRYER") -> UserInfo.useDry = null
                 }
             }
-
             selectLaundry.endTime = null
             selectLaundry.user = null
         }
@@ -103,13 +118,6 @@ class LaundryAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LaundryViewHolder {
         val binding = ItemLaundryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-
-        // 뷰 크기 조정
-        binding.view.viewTreeObserver.addOnGlobalLayoutListener {
-            val width = binding.view.width
-            binding.view.layoutParams.height = width
-            binding.view.requestLayout()
-        }
 
         // 생성된 뷰홀더를 리스트에 추가
         val holder = LaundryViewHolder(binding)
@@ -128,15 +136,18 @@ class LaundryAdapter(
 
         if (laundry.available == false) {
             binding.view.setBackgroundResource(R.drawable.used_color)
+            Log.d("timer", "available false")
             if(holder.runnable == null){
                 holder.timerStart(ListData.laundryLst[pos])
             } else{
-                holder.timerStop()// 타이머 시작
+                Log.d("timer", "available true")
+                holder.timerStop()
             }
         } else {
             binding.view.setBackgroundResource(R.drawable.null_color)
         }
 
+        binding.prgBar.startAnimation()
         binding.laundTitle.text = laundry.washerType
 
         binding.view.setOnClickListener { view ->
@@ -188,6 +199,7 @@ class LaundryAdapter(
     @RequiresApi(VERSION_CODES.O)
     private fun updateUserAndEndTime(selectLaundry: Laundry) {
         // 현재 시간에 사용자 지정 초를 더하는 방식으로 설정
+        selectLaundry.startTime = LocalDateTime.now().withNano(0).toString()
         selectLaundry.endTime = LocalDateTime.now().withNano(0).plusSeconds(UserInfo.seconds.toLong()).toString()
         selectLaundry.available = false
         selectLaundry.user = UserInfo.userId
@@ -195,6 +207,7 @@ class LaundryAdapter(
 
     override fun onViewRecycled(holder: LaundryViewHolder) {
         super.onViewRecycled(holder)
+        Log.d("timer", "viewRecycled")
         holder.timerStop()  // 뷰홀더가 재활용될 때 타이머 정지
     }
 

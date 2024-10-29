@@ -21,14 +21,6 @@ class LaundryRoomAdapter(
         val binding =
             ItemLaundryRoomBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
-        binding.view.layoutParams.height = binding.view.width
-
-        binding.view.viewTreeObserver.addOnGlobalLayoutListener {
-            val width = binding.view.width
-            binding.view.layoutParams.height = width // 높이를 너비로 설정
-            binding.view.requestLayout() // 레이아웃 업데이트 요청
-        }
-
         return LaundryRoomViewHolder(binding)
     }
 
@@ -49,7 +41,7 @@ class LaundryRoomAdapter(
         }
 
         with(binding) {
-            laundryRoom.text = "세탁실 2층"
+            laundryRoom.text = room.roomid
             remainLaundryTxt.setText(remainLaundry.toString())
             remainDryerTxt.setText(remainDryer.toString())
         }

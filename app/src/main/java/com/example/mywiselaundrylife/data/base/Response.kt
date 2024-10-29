@@ -19,7 +19,7 @@ data class FCMResponse(
 data class Laundry(
     var available : Boolean,
     val washerId : Int,
-    val startTime : String?,
+    var startTime : String?,
     var endTime : String?,
     var user : Int?,
     val washerType : String,

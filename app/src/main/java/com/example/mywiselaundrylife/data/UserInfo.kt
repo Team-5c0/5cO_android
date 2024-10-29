@@ -13,5 +13,5 @@ object UserInfo {
     var userLaundryLst = arrayListOf<Laundry>()
     var currentRoom : String = ""
 
-    var seconds = 20
+    var seconds = 10
 }

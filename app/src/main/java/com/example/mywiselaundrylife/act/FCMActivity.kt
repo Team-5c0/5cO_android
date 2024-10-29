@@ -34,11 +34,6 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     var runnableLaundry : Runnable? = null
     var runnableDryer : Runnable? = null
 
-    companion object {
-        private const val PERMISSION_REQUEST_CODE = 5000
-        private const val TAG = "FCMActivity"
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

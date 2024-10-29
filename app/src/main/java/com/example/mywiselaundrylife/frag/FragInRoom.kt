@@ -60,7 +60,7 @@ class FragInRoom : Fragment() {
 
         binding.recyclerview.adapter = laundryAdapter
 
-        binding.currentRoom.text = "현재 세탁실 : ${UserInfo.currentRoom?: "알 수 없음"}"
+        binding.currentRoom.text = "현재 세탁실 : ${UserInfo.currentRoom}"
     }
 
     override fun onDetach() {
