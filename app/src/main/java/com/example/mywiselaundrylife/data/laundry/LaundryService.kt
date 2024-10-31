@@ -1,14 +1,17 @@
-package com.example.mywiselaundrylife.data
+package com.example.mywiselaundrylife.data.laundry
 
 import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.data.base.Room
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface LaundryService {
-    @GET("/wash/rooms")
-    suspend fun getRooms() : Response<ArrayList<Room>>
+    @GET("/wash/rooms/gender")
+    suspend fun getRooms(
+        @Header("Authorization") token: String
+    ) : Response<ArrayList<Room>>
 
     @GET("/wash/washers")
     suspend fun getWashers(

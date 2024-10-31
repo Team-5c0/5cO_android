@@ -2,7 +2,6 @@ package com.example.mywiselaundrylife.act
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
@@ -12,16 +11,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.mywiselaundrylife.R
-import com.example.mywiselaundrylife.data.UserInfo
+import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
 import com.example.mywiselaundrylife.frag.FragMain
 import com.example.mywiselaundrylife.serve.OnItemClickListener
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
 import java.time.Duration
 import java.time.LocalDateTime
 

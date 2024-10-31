@@ -13,11 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.mywiselaundrylife.data.LaundryRequestMananger
-import com.example.mywiselaundrylife.data.ListData
-import com.example.mywiselaundrylife.data.UserInfo
+import com.example.mywiselaundrylife.data.laundry.LaundryRequestMananger
+import com.example.mywiselaundrylife.data.laundry.ListData
+import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.auth.AuthRequestManager
-import com.example.mywiselaundrylife.data.base.FCMResponse
 import com.example.mywiselaundrylife.databinding.ActivityStartBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -59,12 +58,12 @@ class StartActivity : AppCompatActivity() {
                 }
                 else->{
                     loginRequest()
-                    roomRequest()
                 }
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun loginRequest(){
         lifecycleScope.launch {
             try{
@@ -81,11 +80,13 @@ class StartActivity : AppCompatActivity() {
 //                editor.putBoolean("isLogin", true)
 //                editor.apply()
 
+                roomRequest()
+
                 binding.errorText.visibility = View.GONE
 
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
-                showError("잘못된 번호입니다.")
+                showError("dkan")
             } catch (e : Exception){
                 Log.e("mine", "${e.message}")
                 showError("대부분 버그이무니다")
@@ -98,16 +99,9 @@ class StartActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
 
-                val roomResponse = LaundryRequestMananger.roomsRequest()
-                ListData.roomLst = roomResponse!!
+                RefreshData.roomRequest()
 
-                Log.d("room", "${ListData.roomLst}")
-
-                ListData.laundryLst = ArrayList()
-
-                for(i in ListData.roomLst){
-                    washerRequest(i.roomid)
-                }
+                fcmTokenRequest(UserInfo.userId!!, UserInfo.FCMtoken!!)
 
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
@@ -123,24 +117,12 @@ class StartActivity : AppCompatActivity() {
     private fun washerRequest(roomId : String){
         lifecycleScope.launch {
             try {
-                val washerResponse = LaundryRequestMananger.laundryRequest(roomId)
-                for(i in washerResponse!!){
-                    i.roomId = roomId
-                    if(i.user == UserInfo.userId){
-                        when(i.washerType){
-                            "WASHER" -> UserInfo.useLaundry = i
-                            "DRYER" -> UserInfo.useDry = i
-                        }
-                    }
-                }
-                ListData.laundryLst = ArrayList(ListData.laundryLst + washerResponse)
-                Log.d("mine", "${ListData.laundryLst}")
 
-                fcmTokenRequest(UserInfo.userId!!, UserInfo.FCMtoken!!)
+                RefreshData.washerRequest(roomId)
 
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
-                showError("세탁기 못 받아옴") // <- 버그
+                showError("세탁기 못 받아옴")
             } catch (e : Exception){
                 Log.e("mine", "${e.message}")
                 showError("대부분 버그이무니다")

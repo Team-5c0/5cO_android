@@ -1,4 +1,4 @@
-package com.example.mywiselaundrylife.data
+package com.example.mywiselaundrylife.data.user
 
 import com.example.mywiselaundrylife.data.base.Laundry
 

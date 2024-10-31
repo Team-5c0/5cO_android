@@ -11,8 +11,8 @@ import com.example.mywiselaundrylife.serve.OnItemClickListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mywiselaundrylife.adapter.LaundryAdapter
-import com.example.mywiselaundrylife.data.ListData
-import com.example.mywiselaundrylife.data.UserInfo
+import com.example.mywiselaundrylife.data.laundry.ListData
+import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.databinding.FragmentLaundryBinding
 
@@ -54,7 +54,7 @@ class FragInRoom : Fragment() {
         binding.recyclerview.layoutManager = GridLayoutManager(context, 2)
         binding.recyclerview.setHasFixedSize(true)
 
-        laundryAdapter = LaundryAdapter(UserInfo.userLaundryLst){item ->
+        laundryAdapter = LaundryAdapter(UserInfo.userLaundryLst){ item ->
             listener?.onItemClicked(item)
         }
 

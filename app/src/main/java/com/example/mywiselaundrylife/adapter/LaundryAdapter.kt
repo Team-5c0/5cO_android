@@ -11,8 +11,8 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mywiselaundrylife.R
-import com.example.mywiselaundrylife.data.ListData
-import com.example.mywiselaundrylife.data.UserInfo
+import com.example.mywiselaundrylife.data.laundry.ListData
+import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.databinding.ItemLaundryBinding
 import java.time.Duration

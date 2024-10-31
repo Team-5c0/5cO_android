@@ -1,4 +1,4 @@
-package com.example.mywiselaundrylife.data
+package com.example.mywiselaundrylife.data.laundry
 
 import android.os.Build
 import androidx.annotation.RequiresApi

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mywiselaundrylife.data.ListData
+import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.data.base.Room
 import com.example.mywiselaundrylife.databinding.ItemLaundryRoomBinding
 

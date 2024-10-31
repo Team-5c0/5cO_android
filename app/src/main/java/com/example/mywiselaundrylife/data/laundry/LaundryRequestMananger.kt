@@ -1,4 +1,4 @@
-package com.example.mywiselaundrylife.data
+package com.example.mywiselaundrylife.data.laundry
 
 import android.util.Log
 import com.example.mywiselaundrylife.data.base.Laundry
@@ -23,8 +23,8 @@ object LaundryRequestMananger {
 
     private val laundryService : LaundryService = retrofit.create(LaundryService::class.java)
 
-    suspend fun roomsRequest(): ArrayList<Room>? {
-        val response = laundryService.getRooms()
+    suspend fun roomsRequest(token : String): ArrayList<Room>? {
+        val response = laundryService.getRooms(token)
         Log.d("response", "$response")
         if (response.isSuccessful) {
             return response.body() // List<Rooms>를 반환
