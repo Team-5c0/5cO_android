@@ -65,7 +65,6 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         Toast.makeText(this, "${item.washerType} 선택됨", Toast.LENGTH_SHORT).show()
     }
 
-
     fun startTimer(selectLaundry : Laundry){
         when(selectLaundry.washerType){
             "WASHER" -> startLaundry(selectLaundry)
@@ -196,4 +195,14 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         }
         backPressedTime = System.currentTimeMillis()
     }
+
+    fun updateView(){
+        if (UserInfo.useLaundry != null) {
+            startTimer(UserInfo.useLaundry!!)
+        }
+        if (UserInfo.useDry != null){
+            startTimer(UserInfo.useDry!!)
+        }
+    }
+
 }
