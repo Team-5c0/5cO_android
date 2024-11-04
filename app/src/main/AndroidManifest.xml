@@ -31,7 +31,6 @@
 
         <activity android:name=".act.FCMActivity"
             android:exported="false"/>
-
         <activity
             android:name=".act.StartActivity"
             android:exported="true">

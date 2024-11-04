@@ -9,8 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mywiselaundrylife.R
+import com.example.mywiselaundrylife.data.WasherDiffUtil
 import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.base.Laundry
@@ -23,6 +25,7 @@ class LaundryAdapter(
     private val onItemClick: (Laundry) -> Unit
 ) : RecyclerView.Adapter<LaundryAdapter.LaundryViewHolder>() {
 
+    var pos = -1
     private val viewHolders = mutableListOf<LaundryViewHolder>()
 
     inner class LaundryViewHolder(val binding: ItemLaundryBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -86,16 +89,18 @@ class LaundryAdapter(
         @RequiresApi(VERSION_CODES.O)
         private fun updateTimer(duration: Duration, elapsedDuration: Long, totalDuration: Long) {
             binding.view.setBackgroundResource(R.drawable.used_color)
+
             val progress = ((elapsedDuration.toDouble() / totalDuration) * 1000).toInt().coerceIn(0, 1000)
+
             val hours = duration.toHours()
             val minutes = (duration.toMinutes() % 60)
             val seconds = (duration.seconds % 60)
+
             binding.prgBar.progress = progress
             binding.remainTimeTxt.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
 
             Log.d("progress", "${binding.prgBar.progress}")
             Log.d("mine", String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds))
-
         }
 
         private fun onTimerEnd(selectLaundry: Laundry, laundryType: String) {
@@ -128,6 +133,8 @@ class LaundryAdapter(
 
     @RequiresApi(VERSION_CODES.O)
     override fun onBindViewHolder(holder: LaundryViewHolder, position: Int) {
+        pos = position
+
         val binding = holder.binding
         val laundry = laundryLst[position]
         val pos = ListData.laundryLst.indexOfFirst {
@@ -213,5 +220,17 @@ class LaundryAdapter(
 
     fun stopAllTimers() {
         viewHolders.forEach { it.timerStop() }
+    }
+
+    fun updateData(){
+        val diffCallback = WasherDiffUtil(laundryLst, UserInfo.userLaundryLst)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        Log.d("updateData", "${laundryLst}")
+        Log.d("updateData", "${UserInfo.userLaundryLst}")
+
+        laundryLst.clear()
+        laundryLst.addAll(UserInfo.userLaundryLst)
+        diffResult.dispatchUpdatesTo(this)
     }
 }

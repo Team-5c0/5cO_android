@@ -82,7 +82,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
                     // endTime이 null인지 확인
                     if (selectLaundry.endTime == null) {
-                        binding.laundryTime.text = "사용자 없음"
+                        binding.laundryTime.text = "없음"
                         timerStop(selectLaundry)
                         return
                     }
@@ -205,4 +205,18 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.d("lifeTime", "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("lifeTime", "onStop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("lifeTime", "onDestroy")
+    }
 }
