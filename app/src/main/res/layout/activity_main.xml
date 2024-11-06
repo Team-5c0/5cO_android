@@ -5,76 +5,152 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <View
-        android:id="@+id/navigationBar"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="#D9D9D9"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <androidx.appcompat.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/logOutBtn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/logout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="20dp"/>
+
+    <ImageView
+        android:id="@+id/timerImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="로그아웃 하기"
-        android:textColor="@color/black"
-        app:layout_constraintTop_toTopOf="@id/navigationBar"
-        app:layout_constraintStart_toStartOf="@id/navigationBar"
-        app:layout_constraintBottom_toBottomOf="@+id/navigationBar"
+        android:background="@drawable/baseline_timer_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/logOutBtn"
         android:layout_marginStart="20dp"/>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/useWasherTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:text="내 빨래"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/timerImg"
+        app:layout_constraintStart_toEndOf="@id/timerImg"
+        app:layout_constraintTop_toTopOf="@id/timerImg"
+        android:layout_marginStart="3dp"/>
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:weightSum="2"
-        app:layout_constraintTop_toTopOf="@id/navigationBar"
-        app:layout_constraintBottom_toBottomOf="@id/navigationBar"
-        app:layout_constraintEnd_toEndOf="@id/navigationBar"
-        android:layout_marginEnd="20dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timerImg"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="10dp">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:weightSum="2">
+            android:orientation="vertical"
+            android:weightSum="2"
+            android:background="@drawable/border_radius_background"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingStart="20dp"
+            android:layout_marginEnd="5dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="내 세탁 남은 시간 : "/>
+                android:text="세탁"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
             <TextView
                 android:id="@+id/laundryTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="없음"/>
+                android:gravity="start"
+                android:text="-- : --"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:weightSum="2">
+            android:orientation="vertical"
+            android:weightSum="2"
+            android:background="@drawable/border_radius_background"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingStart="20dp"
+            android:layout_marginStart="5dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="내 건조 남은 시간 : "/>
+                android:text="건조"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
             <TextView
                 android:id="@+id/dryerTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="없음"/>
+                android:gravity="start"
+                android:text="-- : --"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
         </LinearLayout>
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/washerImg"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/baseline_local_laundry_service_24"
+        app:layout_constraintTop_toBottomOf="@id/linearLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"/>
+
+    <TextView
+        android:id="@+id/choiceTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="세탁실 선택"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/washerImg"
+        app:layout_constraintStart_toEndOf="@id/washerImg"
+        app:layout_constraintTop_toTopOf="@id/washerImg"
+        android:layout_marginStart="3dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/roomFrame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/washerImg"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:orientation="vertical"/>
+
     <FrameLayout
-        android:id="@+id/frame"
+        android:id="@+id/laundryFrame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/navigationBar"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@id/roomFrame"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />

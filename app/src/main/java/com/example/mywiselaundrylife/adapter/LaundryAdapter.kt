@@ -48,7 +48,7 @@ class LaundryAdapter(
                         if (selectLaundry.endTime == null) {
                             Log.d("timer", "${selectLaundry.endTime}")
                             binding.remainTimeTxt.text = "사용자 없음"
-                            binding.view.setBackgroundResource(R.drawable.null_color)
+//                            binding.view.setBackgroundResource(R.drawable.null_color)
                             timerStop()
                             return
                         }
@@ -88,24 +88,23 @@ class LaundryAdapter(
 
         @RequiresApi(VERSION_CODES.O)
         private fun updateTimer(duration: Duration, elapsedDuration: Long, totalDuration: Long) {
-            binding.view.setBackgroundResource(R.drawable.used_color)
+//            binding.view.setBackgroundResource(R.drawable.used_color)
 
             val progress = ((elapsedDuration.toDouble() / totalDuration) * 1000).toInt().coerceIn(0, 1000)
 
             val hours = duration.toHours()
             val minutes = (duration.toMinutes() % 60)
-            val seconds = (duration.seconds % 60)
 
             binding.prgBar.progress = progress
-            binding.remainTimeTxt.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
+            binding.remainTimeTxt.text = String.format("%02d : %02d", hours, minutes)
 
             Log.d("progress", "${binding.prgBar.progress}")
-            Log.d("mine", String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds))
+            Log.d("mine", String.format("%02d : %02d", hours, minutes))
         }
 
         private fun onTimerEnd(selectLaundry: Laundry, laundryType: String) {
             binding.remainTimeTxt.text = "사용자 없음"
-            binding.view.setBackgroundResource(R.drawable.null_color)
+//            binding.view.setBackgroundResource(R.drawable.null_color)
             timerStop()  // 타이머 정지
 
             if(selectLaundry.user == UserInfo.userId){
@@ -114,6 +113,7 @@ class LaundryAdapter(
                     laundryType.contains("DRYER") -> UserInfo.useDry = null
                 }
             }
+            selectLaundry.startTime = null
             selectLaundry.endTime = null
             selectLaundry.user = null
         }
@@ -137,12 +137,14 @@ class LaundryAdapter(
 
         val binding = holder.binding
         val laundry = laundryLst[position]
+
+        binding.bigCir.text = laundry.washerId.toString()
         val pos = ListData.laundryLst.indexOfFirst {
             it.roomId == laundry.roomId && it.washerId == laundry.washerId
         }
 
         if (laundry.available == false) {
-            binding.view.setBackgroundResource(R.drawable.used_color)
+//            binding.view.setBackgroundResource(R.drawable.used_color)
             Log.d("timer", "available false")
             if(holder.runnable == null){
                 holder.timerStart(ListData.laundryLst[pos])
@@ -151,7 +153,7 @@ class LaundryAdapter(
                 holder.timerStop()
             }
         } else {
-            binding.view.setBackgroundResource(R.drawable.null_color)
+//            binding.view.setBackgroundResource(R.drawable.null_color)
         }
 
         binding.prgBar.startAnimation()

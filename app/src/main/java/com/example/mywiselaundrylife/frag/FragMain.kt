@@ -48,7 +48,7 @@ class FragMain : Fragment() {
                 Log.d("requireTimer", "timer 갱신")
 
                 // 1분 대기
-                delay(10000)
+                delay(1000)
             }
         }
     }
@@ -74,8 +74,7 @@ class FragMain : Fragment() {
         Log.d("mine", "갱신 ${ListData.roomLst}")
         binding.recyclerview.layoutManager = GridLayoutManager(context, 2)
         binding.recyclerview.setHasFixedSize(true)
-        binding.recyclerview.adapter =
-            LaundryRoomAdapter(ListData.roomLst) { Room -> goToRoom(Room.roomid) }
+        binding.recyclerview.adapter = LaundryRoomAdapter(ListData.roomLst) { Room -> goToRoom(Room.roomid) }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -93,7 +92,7 @@ class FragMain : Fragment() {
                 RefreshData.washerRequest(roomId)
                 if(boolean){
                     parentFragmentManager.beginTransaction()
-                        .replace(R.id.frame, FragInRoom())
+                        .replace(R.id.roomFrame, FragInRoom())
                         .addToBackStack(null)
                         .commit()
                 } else{

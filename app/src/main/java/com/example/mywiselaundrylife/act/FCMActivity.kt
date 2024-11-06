@@ -11,10 +11,15 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.mywiselaundrylife.R
+import com.example.mywiselaundrylife.adapter.LaundryRoomAdapter
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
+import com.example.mywiselaundrylife.frag.FragInRoom
 import com.example.mywiselaundrylife.frag.FragMain
 import com.example.mywiselaundrylife.serve.OnItemClickListener
 import java.time.Duration
@@ -37,10 +42,27 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
         if (UserInfo.useLaundry != null) {
             startTimer(UserInfo.useLaundry!!)
+            Log.d("userId", "${UserInfo.useLaundry}")
         }
         if (UserInfo.useDry != null){
             startTimer(UserInfo.useDry!!)
         }
+
+        UserInfo.currentRoom = ListData.roomLst[0].roomid
+
+        binding.roomFrame.layoutManager = GridLayoutManager(this, 1, GridLayoutManager.HORIZONTAL, false)
+        binding.roomFrame.setHasFixedSize(true)
+        binding.roomFrame.adapter = LaundryRoomAdapter(ListData.roomLst){ getRoom ->
+            UserInfo.currentRoom = getRoom.roomid
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.laundryFrame, FragInRoom())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        val snapHelper = PagerSnapHelper()
+        snapHelper.attachToRecyclerView(binding.roomFrame)
+
 
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -48,13 +70,26 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         binding.logOutBtn.setOnClickListener {
             editor.remove("isLogin")
             editor.apply()
+
+            // 내가 사용하고 있는 세탁기 종료하기
+            if(UserInfo.useLaundry != null){
+                timerStop(UserInfo.useLaundry!!)
+                UserInfo.useLaundry = null
+                UserInfo.useDry = null
+            }
+            if(UserInfo.useDry != null){
+                timerStop(UserInfo.useDry!!)
+                UserInfo.useLaundry = null
+                UserInfo.useDry = null
+            }
+
             startActivity(Intent(this, StartActivity::class.java))
             finish()
         }
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.frame, FragMain())
+                .replace(R.id.laundryFrame, FragInRoom())
                 .commit()
         }
     }
@@ -82,7 +117,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
                     // endTime이 null인지 확인
                     if (selectLaundry.endTime == null) {
-                        binding.laundryTime.text = "없음"
+                        binding.laundryTime.text = "-- : --"
                         timerStop(selectLaundry)
                         return
                     }
@@ -114,7 +149,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
                     // endTime이 null인지 확인
                     if (selectLaundry.endTime == null) {
-                        binding.dryerTime.text = "없음"
+                        binding.dryerTime.text = "-- : --"
                         timerStop(selectLaundry)
                         return
                     }
@@ -157,11 +192,10 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     private fun updateTimer(selectLaundry: Laundry, duration: Duration) {
         val hours = duration.toHours()
         val minutes = (duration.toMinutes() % 60)
-        val seconds = (duration.seconds % 60)
 
         when (selectLaundry.washerType) {
-            "WASHER" -> binding.laundryTime.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
-            "DRYER" -> binding.dryerTime.text = String.format("%02d시간 %02d분 %02d초 남음", hours, minutes, seconds)
+            "WASHER" -> binding.laundryTime.text = String.format("%02d : %02d", hours, minutes)
+            "DRYER" -> binding.dryerTime.text = String.format("%02d : %02d", hours, minutes)
         }
     }
 
@@ -171,11 +205,11 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         when(laundryType) {
             "WASHER" ->{
                 UserInfo.useLaundry = null
-                binding.laundryTime.setText("없음")
+                binding.laundryTime.setText("-- : --")
             }
             "DRYER" -> {
                 UserInfo.useDry = null
-                binding.dryerTime.setText("없음")
+                binding.dryerTime.setText("-- : --")
             }
         }
 

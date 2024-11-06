@@ -39,6 +39,7 @@ object LaundryRequestMananger {
         if (response.isSuccessful) {
             return response.body() // List<Rooms>를 반환
         } else {
+            Log.e("mine", "${retrofit2.HttpException(response)}")
             throw retrofit2.HttpException(response)
         }
     }

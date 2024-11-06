@@ -74,6 +74,7 @@ class StartActivity : AppCompatActivity() {
 
                 UserInfo.token = loginResponse.body()?.token
                 UserInfo.userId = binding.inputId.text.toString().toInt()
+                Log.d("userId", "${UserInfo.userId}")
 
 //                editor.putInt("myId", binding.inputId.text.toString().toInt())
 //                editor.putString("myToken", loginResponse.body()?.token)
@@ -113,28 +114,13 @@ class StartActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun washerRequest(roomId : String){
-        lifecycleScope.launch {
-            try {
-
-                RefreshData.washerRequest(roomId)
-
-            } catch (e : retrofit2.HttpException){
-                Log.e("mine", "${e.message}")
-                showError("세탁기 못 받아옴")
-            } catch (e : Exception){
-                Log.e("mine", "${e.message}")
-                showError("대부분 버그이무니다")
-            }
-        }
-    }
-
     private fun fcmTokenRequest(userId : Int, fcmToken : String){
         lifecycleScope.launch {
             try {
                 val FCMResponse = AuthRequestManager.fcmTokenRequest(userId, fcmToken)
+
                 startMainActivity()
+
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
                 showError("ㅋㅋ뭔가 버그남")
@@ -151,7 +137,9 @@ class StartActivity : AppCompatActivity() {
     }
 
     private fun startMainActivity(){
-        UserInfo.userId = binding.inputId.text.toString().toInt()
+
+        Log.d("userId", "${UserInfo.useLaundry}")
+
         val intent = Intent(this, FCMActivity::class.java)
         startActivity(intent)
         finish()

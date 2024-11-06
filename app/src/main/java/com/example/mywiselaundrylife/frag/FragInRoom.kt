@@ -49,7 +49,7 @@ class FragInRoom : Fragment() {
                 Log.d("requireTimer", "timer 갱신")
 
                 // 1분 대기
-                delay(10000)
+                delay(1000)
                 Log.d("reset", "갱신")
             }
         }
@@ -79,10 +79,6 @@ class FragInRoom : Fragment() {
 
         startCoroutineTimer()
 
-        binding.backBtn.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
-
         return binding.root
     }
 
@@ -93,7 +89,7 @@ class FragInRoom : Fragment() {
         } as ArrayList<Laundry>
 
         if(!::laundryAdapter.isInitialized){
-            binding.recyclerview.layoutManager = GridLayoutManager(context, 2)
+            binding.recyclerview.layoutManager = GridLayoutManager(context, 3)
             binding.recyclerview.setHasFixedSize(true)
 
             laundryAdapter = LaundryAdapter(UserInfo.userLaundryLst){ item ->
@@ -138,11 +134,10 @@ class FragInRoom : Fragment() {
         startCoroutineTimer()
     }
 
+
     override fun onPause() {
         super.onPause()
         stopCoroutineTimer()
     }
 
 }
-
-

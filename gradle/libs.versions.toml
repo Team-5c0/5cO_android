@@ -16,6 +16,7 @@ ypwaveview = "1.0.4"
 waveprogressbar = "v1.0.0"
 waveview = "1.0.0"
 waveviewVersion = "1.0.0"
+library = "0.3.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,7 @@ ypwaveview = { group = "com.yangpingapps", name = "ypwaveview", version.ref = "y
 waveprogressbar = { group = "com.github.cjhandroid", name = "WaveProgressBar", version.ref = "waveprogressbar" }
 waveview = { group = "com.github.onlynight", name = "WaveView", version.ref = "waveview" }
 gelitenight-waveview = { group = "com.gelitenight.waveview", name = "waveview", version.ref = "waveviewVersion" }
+library = { group = "me.itangqi.waveloadingview", name = "library", version.ref = "library" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
