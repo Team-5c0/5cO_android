@@ -45,11 +45,6 @@ class StartActivity : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
 
-//        if (sharedPreferences.getBoolean("isLogin", false)){
-//            UserInfo.userId = sharedPreferences.getInt("myId", 1000)
-//            startMainActivity()
-//        }
-
         binding.toInBtn.setOnClickListener{
             when{
                 binding.inputId.text.isNullOrBlank()->{

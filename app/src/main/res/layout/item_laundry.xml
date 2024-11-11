@@ -6,39 +6,41 @@
     android:layout_height="wrap_content"
     android:id="@+id/view"
     android:layout_margin="10dp"
-    android:background="@drawable/washer_background">
+    android:background="@drawable/washer_background"
+    android:paddingTop="5dp">
 
     <TextView
         android:id="@+id/smallLine"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="▬"
-        android:textSize="20dp"
+        android:text="㆒"
+        android:textSize="8sp"
+        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/line"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginStart="10dp"/>
 
     <TextView
         android:id="@+id/bigCir"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="◉"
-        android:textSize="20dp"
+        android:textSize="8sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/line"
-        android:layout_marginEnd="20dp"/>
+        android:layout_marginEnd="10dp"/>
 
     <TextView
         android:id="@+id/smallCir"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="◦◦◦"
-        android:textSize="20dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="8sp"
+        app:layout_constraintTop_toTopOf="@id/bigCir"
         app:layout_constraintEnd_toStartOf="@id/bigCir"
-        app:layout_constraintBottom_toTopOf="@id/line" />
+        app:layout_constraintBottom_toBottomOf="@id/bigCir" />
 
     <View
         android:id="@+id/line"
@@ -46,8 +48,8 @@
         android:layout_height="3dp"
         android:background="#000000"
         app:layout_constraintTop_toBottomOf="@id/smallCir"
-        android:layout_marginBottom="10dp"/>
-
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"/>
 
     <com.yangp.ypwaveview.YPWaveView
         android:id="@+id/prgBar"
@@ -62,9 +64,24 @@
         app:frontColor="#01A9FA"
         app:textHidden="true"
         app:behideColor="#117CAB"
+        app:borderWidthSize="3dp"
         app:textColor="#9ED2FF"
         app:max="1000"
         app:progress="0"
+        android:layout_margin="20dp"/>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/windLottie"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintTop_toBottomOf="@id/line"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/laundTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/not_using_animation"
         android:layout_margin="20dp"/>
 
     <TextView
@@ -84,16 +101,16 @@
         android:id="@+id/remainTimeTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="00 : 00"
         android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginBottom="20dp"/>
-
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

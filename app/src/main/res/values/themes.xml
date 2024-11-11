@@ -3,6 +3,12 @@
     <style name="Base.Theme.MyWiseLaundryLife" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">#1A2D5B</item>
+        <item name="android:statusBarColor">#F2F4F6</item>
+        <item name="android:windowBackground">#F2F4F6</item>
+        <item name="textColor">#000000</item>
+        <item name="android:fontFamily">@font/noto_snas_kr_medium</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
 
     <style name="Theme.MyWiseLaundryLife" parent="Base.Theme.MyWiseLaundryLife" />

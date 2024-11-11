@@ -20,7 +20,6 @@ import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
 import com.example.mywiselaundrylife.frag.FragInRoom
-import com.example.mywiselaundrylife.frag.FragMain
 import com.example.mywiselaundrylife.serve.OnItemClickListener
 import java.time.Duration
 import java.time.LocalDateTime
@@ -30,7 +29,9 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     private var backPressedTime: Long = 0
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityMainBinding
+
     private val handler = Handler(Looper.getMainLooper())
+
     var runnableLaundry : Runnable? = null
     var runnableDryer : Runnable? = null
 
@@ -56,13 +57,11 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
             UserInfo.currentRoom = getRoom.roomid
             supportFragmentManager.beginTransaction()
                 .replace(R.id.laundryFrame, FragInRoom())
-                .addToBackStack(null)
                 .commit()
         }
 
         val snapHelper = PagerSnapHelper()
         snapHelper.attachToRecyclerView(binding.roomFrame)
-
 
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -75,13 +74,13 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
             if(UserInfo.useLaundry != null){
                 timerStop(UserInfo.useLaundry!!)
                 UserInfo.useLaundry = null
-                UserInfo.useDry = null
             }
             if(UserInfo.useDry != null){
                 timerStop(UserInfo.useDry!!)
-                UserInfo.useLaundry = null
                 UserInfo.useDry = null
             }
+
+            UserInfo.userId = null
 
             startActivity(Intent(this, StartActivity::class.java))
             finish()
@@ -102,7 +101,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
     fun startTimer(selectLaundry : Laundry){
         when(selectLaundry.washerType){
-            "WASHER" -> startLaundry(selectLaundry)
+            "WASHER" -> {startLaundry(selectLaundry)}
             "DRYER" -> startDryer(selectLaundry)
         }
     }
@@ -220,6 +219,19 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     override fun onBackPressed() {
         Log.d("mine", "${supportFragmentManager.backStackEntryCount}")
         if (backPressedTime + 2000 > System.currentTimeMillis() && supportFragmentManager.backStackEntryCount <= 0) {
+
+            // 내가 사용하고 있는 세탁기 종료하기
+            if(UserInfo.useLaundry != null){
+                timerStop(UserInfo.useLaundry!!)
+                UserInfo.useLaundry = null
+            }
+            if(UserInfo.useDry != null){
+                timerStop(UserInfo.useDry!!)
+                UserInfo.useDry = null
+            }
+
+            UserInfo.userId = null
+
             super.onBackPressed()
             return
         } else if (supportFragmentManager.backStackEntryCount > 0) {

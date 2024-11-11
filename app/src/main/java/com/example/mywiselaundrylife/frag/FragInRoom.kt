@@ -43,6 +43,8 @@ class FragInRoom : Fragment() {
 
                 setRecyclerView()
 
+                RefreshData.roomRequest()
+
                 // MainActivity 뷰 갱신
                 (activity as? FCMActivity)?.updateView()
 
@@ -77,8 +79,6 @@ class FragInRoom : Fragment() {
 
         setRecyclerView()
 
-        startCoroutineTimer()
-
         return binding.root
     }
 
@@ -97,20 +97,10 @@ class FragInRoom : Fragment() {
             }
             binding.recyclerview.adapter = laundryAdapter
         } else{
-            refreshWasher()
             laundryAdapter.updateData()
         }
-
-        binding.currentRoom.text = "현재 세탁실 : ${UserInfo.currentRoom}"
+//        binding.currentRoom.text = "현재 세탁실 : ${UserInfo.currentRoom}"
     }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun refreshWasher(){
-        lifecycleScope.launch {
-            RefreshData.washerRequest(UserInfo.currentRoom)
-        }
-    }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
@@ -134,10 +124,14 @@ class FragInRoom : Fragment() {
         startCoroutineTimer()
     }
 
-
     override fun onPause() {
         super.onPause()
         stopCoroutineTimer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        laundryAdapter.stopAllTimers()  // View가 파괴될 때 타이머 정지
     }
 
 }

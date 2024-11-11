@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.data.base.Room
+import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.databinding.ItemLaundryRoomBinding
 
 class LaundryRoomAdapter(
@@ -14,8 +16,41 @@ class LaundryRoomAdapter(
     private val onItemClick: (Room) -> Unit
 ) : RecyclerView.Adapter<LaundryRoomAdapter.LaundryRoomViewHolder>() {
 
-    inner class LaundryRoomViewHolder(val binding: ItemLaundryRoomBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    private var selectedPosition: Int = 0
+
+    inner class LaundryRoomViewHolder(val binding: ItemLaundryRoomBinding) : RecyclerView.ViewHolder(binding.root){
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        fun bind(room: Room, position: Int){
+
+            if(room.roomid == UserInfo.currentRoom){
+                binding.view.isSelected = true
+            }
+
+            binding.view.isSelected = (selectedPosition == position)
+
+            val remainLaundry = remainSum(room, "WASHER")
+            val remainDryer = remainSum(room, "DRYER")
+
+            binding.view.setOnClickListener {
+                val previousPosition = selectedPosition
+                selectedPosition = if (selectedPosition == position){
+                    return@setOnClickListener
+                }else {
+                    position
+                }
+                notifyItemChanged(previousPosition)
+                notifyItemChanged(position)
+                onItemClick(room)
+            }
+
+            with(binding) {
+                laundryRoom.text = room.roomid
+                remainLaundryTxt.setText(remainLaundry.toString())
+                remainDryerTxt.setText(remainDryer.toString())
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LaundryRoomViewHolder {
         val binding =
@@ -30,21 +65,9 @@ class LaundryRoomAdapter(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: LaundryRoomViewHolder, position: Int) {
-        val binding = holder.binding
         val room = roomLst[position]
 
-        val remainLaundry = remainSum(room, "WASHER")
-        val remainDryer = remainSum(room, "DRYER")
-
-        binding.view.setOnClickListener {
-            onItemClick(room)
-        }
-
-        with(binding) {
-            laundryRoom.text = room.roomid
-            remainLaundryTxt.setText(remainLaundry.toString())
-            remainDryerTxt.setText(remainDryer.toString())
-        }
+        holder.bind(room, position)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

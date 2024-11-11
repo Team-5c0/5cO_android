@@ -3,5 +3,9 @@
     <style name="Base.Theme.MyWiseLaundryLife" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">#1A2D5B</item>
+        <item name="android:statusBarColor">#1F1F1F</item>
+        <item name="android:windowBackground">#1F1F1F</item>
+        <item name="textColor">#FFFFFF</item>
     </style>
 </resources>

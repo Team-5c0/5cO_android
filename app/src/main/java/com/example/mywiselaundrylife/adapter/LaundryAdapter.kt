@@ -35,6 +35,10 @@ class LaundryAdapter(
         fun timerStart(selectLaundry: Laundry) {
             // 이전 타이머 정지
             Log.d("timer", "${selectLaundry}")
+            if(selectLaundry.washerType == "DRYER"){
+                binding.windLottie.setAnimation(R.raw.using_animation)
+                binding.windLottie.playAnimation()
+            }
             timerStop()
 
             runnable = object : Runnable {
@@ -47,8 +51,7 @@ class LaundryAdapter(
                         // endTime이 null인지 확인
                         if (selectLaundry.endTime == null) {
                             Log.d("timer", "${selectLaundry.endTime}")
-                            binding.remainTimeTxt.text = "사용자 없음"
-//                            binding.view.setBackgroundResource(R.drawable.null_color)
+                            binding.remainTimeTxt.text = "00 : 00"
                             timerStop()
                             return
                         }
@@ -66,7 +69,7 @@ class LaundryAdapter(
                             onTimerEnd(selectLaundry, selectLaundry.washerType)
                         } else {
                             Log.d("timer", "update")
-                            updateTimer(duration, elapsedDuration, totalDuration)  // 타이머 업데이트
+                            updateTimer(duration, elapsedDuration, totalDuration) // 타이머 업데이트
                             handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
                         }
                     } catch (e: Exception) {
@@ -98,19 +101,23 @@ class LaundryAdapter(
             binding.prgBar.progress = progress
             binding.remainTimeTxt.text = String.format("%02d : %02d", hours, minutes)
 
-            Log.d("progress", "${binding.prgBar.progress}")
-            Log.d("mine", String.format("%02d : %02d", hours, minutes))
+            Log.d("timer", "${binding.prgBar.progress}")
+            Log.d("timer", String.format("%02d : %02d", hours, minutes))
         }
 
         private fun onTimerEnd(selectLaundry: Laundry, laundryType: String) {
-            binding.remainTimeTxt.text = "사용자 없음"
+            binding.remainTimeTxt.text = "00 : 00"
 //            binding.view.setBackgroundResource(R.drawable.null_color)
             timerStop()  // 타이머 정지
 
             if(selectLaundry.user == UserInfo.userId){
                 when {
                     laundryType.contains("WASHER") -> UserInfo.useLaundry = null
-                    laundryType.contains("DRYER") -> UserInfo.useDry = null
+                    laundryType.contains("DRYER") -> {
+                        UserInfo.useDry = null
+                        binding.windLottie.cancelAnimation()
+                        binding.windLottie.setAnimation(R.raw.not_using_animation)
+                    }
                 }
             }
             selectLaundry.startTime = null
@@ -138,7 +145,8 @@ class LaundryAdapter(
         val binding = holder.binding
         val laundry = laundryLst[position]
 
-        binding.bigCir.text = laundry.washerId.toString()
+//        binding.bigCir.text = laundry.washerId.toString()
+
         val pos = ListData.laundryLst.indexOfFirst {
             it.roomId == laundry.roomId && it.washerId == laundry.washerId
         }
@@ -152,15 +160,21 @@ class LaundryAdapter(
                 Log.d("timer", "available true")
                 holder.timerStop()
             }
-        } else {
-//            binding.view.setBackgroundResource(R.drawable.null_color)
         }
 
         binding.prgBar.startAnimation()
         binding.laundTitle.text = laundry.washerType
 
-        binding.view.setOnClickListener { view ->
-            laundryClick(view, laundry, pos, holder)
+        if(binding.laundTitle.text == "WASHER"){
+            binding.windLottie.visibility = View.INVISIBLE
+            binding.prgBar.visibility = View.VISIBLE
+        }else if(binding.laundTitle.text == "DRYER") {
+            binding.prgBar.visibility = View.INVISIBLE
+            binding.windLottie.visibility = View.VISIBLE
+        }
+
+        binding.view.setOnClickListener {
+            view -> laundryClick(view, laundry, pos, holder)
         }
     }
 
@@ -217,7 +231,8 @@ class LaundryAdapter(
     override fun onViewRecycled(holder: LaundryViewHolder) {
         super.onViewRecycled(holder)
         Log.d("timer", "viewRecycled")
-        holder.timerStop()  // 뷰홀더가 재활용될 때 타이머 정지
+        holder.timerStop() // 뷰홀더가 재활용될 때 타이머 정지
+        holder.binding.windLottie.cancelAnimation()
     }
 
     fun stopAllTimers() {
