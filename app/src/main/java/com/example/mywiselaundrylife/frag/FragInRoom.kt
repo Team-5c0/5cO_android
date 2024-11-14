@@ -12,6 +12,7 @@ import com.example.mywiselaundrylife.serve.OnItemClickListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.mywiselaundrylife.act.FCMActivity
 import com.example.mywiselaundrylife.act.RefreshData
 import com.example.mywiselaundrylife.adapter.LaundryAdapter

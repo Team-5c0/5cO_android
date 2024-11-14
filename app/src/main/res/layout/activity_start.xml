@@ -27,6 +27,7 @@
         android:gravity="center"
         android:hint="ex) 1101"
         android:textSize="20dp"
+        android:text="1000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/showText"
@@ -54,7 +55,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inputId"
+        android:background="@drawable/room_btn_background"
+        android:textColor="#000000"
         android:text="로그인하기"
-        android:padding="15dp"/>
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

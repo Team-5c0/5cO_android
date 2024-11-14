@@ -6,8 +6,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/view"
     android:layout_margin="10dp"
-    android:background="@drawable/washer_background"
-    android:paddingTop="5dp">
+    android:background="@drawable/washer_background">
 
     <TextView
         android:id="@+id/smallLine"
@@ -45,11 +44,25 @@
     <View
         android:id="@+id/line"
         android:layout_width="match_parent"
-        android:layout_height="3dp"
+        android:layout_height="1dp"
         android:background="#000000"
         app:layout_constraintTop_toBottomOf="@id/smallCir"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp" />
+
+    <TextView
+        android:id="@+id/washerId"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:text="99"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@id/line"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/washer_id_back"
+        android:textColor="#FFFFFF"
+        android:layout_margin="5dp" />
 
     <com.yangp.ypwaveview.YPWaveView
         android:id="@+id/prgBar"
@@ -64,25 +77,31 @@
         app:frontColor="#01A9FA"
         app:textHidden="true"
         app:behideColor="#117CAB"
-        app:borderWidthSize="3dp"
+        app:borderWidthSize="1dp"
         app:textColor="#9ED2FF"
         app:max="1000"
         app:progress="0"
-        android:layout_margin="20dp"/>
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginBottom="15dp"/>
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/windLottie"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintTop_toBottomOf="@id/line"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:layout_marginBottom="15dp"
         app:layout_constraintBottom_toTopOf="@id/laundTitle"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/line"
         app:lottie_autoPlay="false"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/not_using_animation"
-        android:layout_margin="20dp"/>
+        app:lottie_rawRes="@raw/not_using_animation" />
 
     <TextView
         android:id="@+id/laundTitle"
@@ -101,7 +120,7 @@
         android:id="@+id/remainTimeTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="10dp"
         android:gravity="center"
         android:text="00 : 00"
         android:textColor="@color/black"
@@ -109,7 +128,6 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
 

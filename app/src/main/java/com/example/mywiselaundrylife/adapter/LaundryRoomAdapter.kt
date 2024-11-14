@@ -1,9 +1,13 @@
 package com.example.mywiselaundrylife.adapter
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.StateListDrawable
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.data.laundry.ListData
@@ -24,7 +28,13 @@ class LaundryRoomAdapter(
         fun bind(room: Room, position: Int){
 
             if(room.roomid == UserInfo.currentRoom){
+                val color = ContextCompat.getColor(itemView.context, R.color.notSelectBtn)
+                binding.laundryRoom.setTextColor(color)
                 binding.view.isSelected = true
+            } else{
+                val color = ContextCompat.getColor(itemView.context, R.color.selectBtn)
+                binding.laundryRoom.setTextColor(color)
+                binding.view.isSelected = false
             }
 
             binding.view.isSelected = (selectedPosition == position)

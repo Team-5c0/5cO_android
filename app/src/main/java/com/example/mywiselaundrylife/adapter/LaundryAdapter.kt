@@ -34,12 +34,15 @@ class LaundryAdapter(
 
         fun timerStart(selectLaundry: Laundry) {
             // 이전 타이머 정지
+            timerStop()
+
+            binding.prgBar.startAnimation()
+
             Log.d("timer", "${selectLaundry}")
             if(selectLaundry.washerType == "DRYER"){
                 binding.windLottie.setAnimation(R.raw.using_animation)
                 binding.windLottie.playAnimation()
             }
-            timerStop()
 
             runnable = object : Runnable {
                 @RequiresApi(VERSION_CODES.O)
@@ -81,6 +84,10 @@ class LaundryAdapter(
         }
 
         fun timerStop() {
+
+            binding.windLottie.cancelAnimation()
+            binding.windLottie.setAnimation(R.raw.not_using_animation)
+
             runnable?.let {
                 handler.removeCallbacks(it)
                 binding?.prgBar?.progress = 0  // binding이 null이 아닌 경우에만 설정
@@ -145,7 +152,7 @@ class LaundryAdapter(
         val binding = holder.binding
         val laundry = laundryLst[position]
 
-//        binding.bigCir.text = laundry.washerId.toString()
+        binding.washerId.text = laundry.washerId.toString()
 
         val pos = ListData.laundryLst.indexOfFirst {
             it.roomId == laundry.roomId && it.washerId == laundry.washerId
@@ -249,5 +256,10 @@ class LaundryAdapter(
         laundryLst.clear()
         laundryLst.addAll(UserInfo.userLaundryLst)
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    override fun onViewAttachedToWindow(holder: LaundryViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        Log.d("visible", "visible")
     }
 }

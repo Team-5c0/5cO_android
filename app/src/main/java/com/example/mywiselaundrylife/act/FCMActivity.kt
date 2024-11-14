@@ -9,10 +9,17 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.adapter.LaundryRoomAdapter
 import com.example.mywiselaundrylife.data.user.UserInfo
@@ -20,6 +27,7 @@ import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
 import com.example.mywiselaundrylife.frag.FragInRoom
+import com.example.mywiselaundrylife.serve.CustomSnapHelper
 import com.example.mywiselaundrylife.serve.OnItemClickListener
 import java.time.Duration
 import java.time.LocalDateTime
@@ -39,7 +47,14 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+
+        enableEdgeToEdge()
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         if (UserInfo.useLaundry != null) {
             startTimer(UserInfo.useLaundry!!)
@@ -49,9 +64,11 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
             startTimer(UserInfo.useDry!!)
         }
 
+        binding.remainWashersTxt.text = remainWasherTxt()
         UserInfo.currentRoom = ListData.roomLst[0].roomid
 
-        binding.roomFrame.layoutManager = GridLayoutManager(this, 1, GridLayoutManager.HORIZONTAL, false)
+        val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.roomFrame.layoutManager = layoutManager
         binding.roomFrame.setHasFixedSize(true)
         binding.roomFrame.adapter = LaundryRoomAdapter(ListData.roomLst){ getRoom ->
             UserInfo.currentRoom = getRoom.roomid
@@ -60,8 +77,8 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
                 .commit()
         }
 
-        val snapHelper = PagerSnapHelper()
-        snapHelper.attachToRecyclerView(binding.roomFrame)
+        val pagerSnapHelper = CustomSnapHelper()
+        pagerSnapHelper.attachToRecyclerView(binding.roomFrame)
 
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -91,6 +108,72 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
                 .replace(R.id.laundryFrame, FragInRoom())
                 .commit()
         }
+    }
+
+    @RequiresApi(VERSION_CODES.O)
+    private fun remainWasherTxt(): String {
+        val remainWasher = remainWasherSum()
+        return remainWasher
+    }
+
+    @RequiresApi(VERSION_CODES.O)
+    private fun remainWasherSum() : String{
+        // 0 : 세탁기, 1 : 건조기
+        val remainWasherLst = mutableListOf<String?>(null, null)
+        val remainSumLst = mutableListOf(0, 0)
+        var returnTxt = ""
+
+        for(wash in ListData.laundryLst){
+            when{
+                (wash.available && wash.washerType == "WASHER")->{
+                    if(wash.washerType == "WASHER"){
+                        if(remainWasherLst[0] == null){
+                            remainWasherLst[0] = "${wash.roomId} 세탁기${wash.washerId}"
+                            continue
+                        }
+                        remainSumLst[0]++
+                    }
+                }
+                (wash.available && wash.washerType == "DRYER")->{
+                    if(wash.washerType == "DRYER"){
+                        if(remainWasherLst[1] == null){
+                            remainWasherLst[1] = "${wash.roomId} 건조기${wash.washerId}"
+                            continue
+                        }
+                        remainSumLst[1]++
+                    }
+                }
+            }
+        }
+
+        val washer1 = remainWasherLst[0]
+        val washer2 = remainWasherLst[1]
+        val washerSum = remainSumLst[0]
+        val dryerSum = remainSumLst[1]
+
+        returnTxt = when {
+            washer1 != null && washer2 != null && washerSum != 0 && dryerSum != 0 ->
+                "$washer1, $washer2 이외에도 세탁기 ${washerSum}대, 건조기 ${dryerSum}대 사용가능해요"
+
+            washer1 != null && washer2 != null && washerSum != 0 && dryerSum == 0 ->
+                "$washer1, $washer2 이외에도 세탁기 ${washerSum}대 사용가능해요"
+
+            washer1 != null && washer2 != null && washerSum == 0 && dryerSum != 0 ->
+                "$washer1, $washer2 이외에도 건조기 ${dryerSum}대 사용가능해요"
+
+            washer1 != null && washer2 != null && washerSum == 0 && dryerSum == 0 ->
+                "$washer1, $washer2 사용가능해요"
+
+            washer1 != null && washer2 == null ->
+                "$washer1 사용가능해요"
+
+            washer1 == null && washer2 != null ->
+                "$washer2 사용가능해요"
+
+            else -> "사용가능한 세탁 & 건조기가 없어요"
+        }
+
+        return returnTxt
     }
 
     // 인터페이스 구현: 아이템 클릭 시 TextView 업데이트
@@ -242,6 +325,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         backPressedTime = System.currentTimeMillis()
     }
 
+    @RequiresApi(VERSION_CODES.O)
     fun updateView(){
         if (UserInfo.useLaundry != null) {
             startTimer(UserInfo.useLaundry!!)
@@ -249,6 +333,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         if (UserInfo.useDry != null){
             startTimer(UserInfo.useDry!!)
         }
+        binding.remainWashersTxt.text = remainWasherTxt()
     }
 
     override fun onPause() {

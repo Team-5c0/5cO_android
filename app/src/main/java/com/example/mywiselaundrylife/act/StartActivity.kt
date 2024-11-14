@@ -8,11 +8,15 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.data.laundry.LaundryRequestMananger
 import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.data.user.UserInfo
@@ -37,8 +41,16 @@ class StartActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityStartBinding.inflate(layoutInflater)
+
+        enableEdgeToEdge()
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         setFCMToken()
         permissionCheck()
@@ -82,7 +94,7 @@ class StartActivity : AppCompatActivity() {
 
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
-                showError("dkan")
+                showError("로그인에 실패하였습니다")
             } catch (e : Exception){
                 Log.e("mine", "${e.message}")
                 showError("대부분 버그이무니다")
