@@ -2,11 +2,13 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.MyWiseLaundryLife" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/black</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="colorPrimary">#1A2D5B</item>
-        <item name="android:statusBarColor">#1F1F1F</item>
         <item name="android:windowBackground">#1F1F1F</item>
         <item name="textColor">#FFFFFF</item>
+        <item name="android:fontFamily">@font/noto_snas_kr_medium</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
+
+    <style name="Theme.MyWiseLaundryLife" parent="Base.Theme.MyWiseLaundryLife" />
 </resources>

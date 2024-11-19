@@ -30,10 +30,12 @@
 
 
         <activity android:name=".act.FCMActivity"
-            android:exported="false"/>
+            android:exported="false"
+            android:theme="@style/Theme.MyWiseLaundryLife"/>
         <activity
             android:name=".act.StartActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.MyWiseLaundryLife">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

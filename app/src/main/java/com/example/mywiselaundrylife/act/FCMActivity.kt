@@ -64,7 +64,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
             startTimer(UserInfo.useDry!!)
         }
 
-        binding.remainWashersTxt.text = remainWasherTxt()
+        binding.remainWashersTxt.text = remainWasherSum()
         UserInfo.currentRoom = ListData.roomLst[0].roomid
 
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -111,69 +111,67 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     @RequiresApi(VERSION_CODES.O)
-    private fun remainWasherTxt(): String {
-        val remainWasher = remainWasherSum()
-        return remainWasher
-    }
-
-    @RequiresApi(VERSION_CODES.O)
-    private fun remainWasherSum() : String{
+    private fun remainWasherSum() : String {
         // 0 : 세탁기, 1 : 건조기
-        val remainWasherLst = mutableListOf<String?>(null, null)
-        val remainSumLst = mutableListOf(0, 0)
-        var returnTxt = ""
+        val remainWasherLst = arrayOfNulls<String>(2) // String? 배열 초기화
+        val remainSumLst = IntArray(2) // Int 배열 초기화
 
-        for(wash in ListData.laundryLst){
-            when{
-                (wash.available && wash.washerType == "WASHER")->{
-                    if(wash.washerType == "WASHER"){
-                        if(remainWasherLst[0] == null){
-                            remainWasherLst[0] = "${wash.roomId} 세탁기${wash.washerId}"
-                            continue
-                        }
+        // 데이터 전처리
+        ListData.laundryLst.filter { it.available }.forEach { wash ->
+            when (wash.washerType) {
+                "WASHER" -> {
+                    if (remainWasherLst[0] == null) {
+                        remainWasherLst[0] = "${wash.roomId} 세탁기${wash.washerId}"
+                    } else {
                         remainSumLst[0]++
                     }
                 }
-                (wash.available && wash.washerType == "DRYER")->{
-                    if(wash.washerType == "DRYER"){
-                        if(remainWasherLst[1] == null){
-                            remainWasherLst[1] = "${wash.roomId} 건조기${wash.washerId}"
-                            continue
-                        }
+                "DRYER" -> {
+                    if (remainWasherLst[1] == null) {
+                        remainWasherLst[1] = "${wash.roomId} 건조기${wash.washerId}"
+                    } else {
                         remainSumLst[1]++
                     }
                 }
             }
         }
 
-        val washer1 = remainWasherLst[0]
-        val washer2 = remainWasherLst[1]
-        val washerSum = remainSumLst[0]
-        val dryerSum = remainSumLst[1]
+        val (washer, dryer) = remainWasherLst
+        val (washerSum, dryerSum) = remainSumLst
 
-        returnTxt = when {
-            washer1 != null && washer2 != null && washerSum != 0 && dryerSum != 0 ->
-                "$washer1, $washer2 이외에도 세탁기 ${washerSum}대, 건조기 ${dryerSum}대 사용가능해요"
+        return when {
+            washer != null && dryer != null -> {
+                val washerMessage = if (washerSum != 0) "세탁기 ${washerSum}대" else null
+                val dryerMessage = if (dryerSum != 0) "건조기 ${dryerSum}대" else null
 
-            washer1 != null && washer2 != null && washerSum != 0 && dryerSum == 0 ->
-                "$washer1, $washer2 이외에도 세탁기 ${washerSum}대 사용가능해요"
+                when {
+                    washerMessage != null && dryerMessage != null ->
+                        "$washer, $dryer 이외에도 $washerMessage, $dryerMessage 사용가능해요"
+                    washerMessage != null ->
+                        "$washer, $dryer 이외에도 $washerMessage 사용가능해요"
+                    dryerMessage != null ->
+                        "$washer, $dryer 이외에도 $dryerMessage 사용가능해요"
+                    else ->
+                        "$washer, $dryer 사용가능해요"
+                }
+            }
 
-            washer1 != null && washer2 != null && washerSum == 0 && dryerSum != 0 ->
-                "$washer1, $washer2 이외에도 건조기 ${dryerSum}대 사용가능해요"
+            washer != null -> {
+                if (washerSum != 0)
+                    "$washer 이외에도 세탁기 ${washerSum}대 사용가능해요"
+                else
+                    "$washer 사용가능해요"
+            }
 
-            washer1 != null && washer2 != null && washerSum == 0 && dryerSum == 0 ->
-                "$washer1, $washer2 사용가능해요"
-
-            washer1 != null && washer2 == null ->
-                "$washer1 사용가능해요"
-
-            washer1 == null && washer2 != null ->
-                "$washer2 사용가능해요"
+            dryer != null -> {
+                if (dryerSum != 0)
+                    "$dryer 이외에도 건조기 ${dryerSum}대 사용가능해요"
+                else
+                    "$dryer 사용가능해요"
+            }
 
             else -> "사용가능한 세탁 & 건조기가 없어요"
         }
-
-        return returnTxt
     }
 
     // 인터페이스 구현: 아이템 클릭 시 TextView 업데이트
@@ -333,7 +331,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         if (UserInfo.useDry != null){
             startTimer(UserInfo.useDry!!)
         }
-        binding.remainWashersTxt.text = remainWasherTxt()
+        binding.remainWashersTxt.text = remainWasherSum()
     }
 
     override fun onPause() {

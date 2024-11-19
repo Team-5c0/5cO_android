@@ -21,8 +21,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 class LaundryAdapter(
-    private val laundryLst: ArrayList<Laundry>,
-    private val onItemClick: (Laundry) -> Unit
+    private val laundryLst: ArrayList<Laundry>
 ) : RecyclerView.Adapter<LaundryAdapter.LaundryViewHolder>() {
 
     var pos = -1
@@ -35,8 +34,6 @@ class LaundryAdapter(
         fun timerStart(selectLaundry: Laundry) {
             // 이전 타이머 정지
             timerStop()
-
-            binding.prgBar.startAnimation()
 
             Log.d("timer", "${selectLaundry}")
             if(selectLaundry.washerType == "DRYER"){
@@ -98,7 +95,6 @@ class LaundryAdapter(
 
         @RequiresApi(VERSION_CODES.O)
         private fun updateTimer(duration: Duration, elapsedDuration: Long, totalDuration: Long) {
-//            binding.view.setBackgroundResource(R.drawable.used_color)
 
             val progress = ((elapsedDuration.toDouble() / totalDuration) * 1000).toInt().coerceIn(0, 1000)
 
@@ -169,7 +165,6 @@ class LaundryAdapter(
             }
         }
 
-        binding.prgBar.startAnimation()
         binding.laundTitle.text = laundry.washerType
 
         if(binding.laundTitle.text == "WASHER"){
@@ -179,60 +174,6 @@ class LaundryAdapter(
             binding.prgBar.visibility = View.INVISIBLE
             binding.windLottie.visibility = View.VISIBLE
         }
-
-        binding.view.setOnClickListener {
-            view -> laundryClick(view, laundry, pos, holder)
-        }
-    }
-
-    @RequiresApi(VERSION_CODES.O)
-    private fun laundryClick(view: View, laundry: Laundry, pos: Int, holder: LaundryViewHolder) {
-        val binding = holder.binding
-
-        if (isUsedLaundry(view, laundry, binding)) return
-
-        if (pos != -1) {
-            val selectLaundry = ListData.laundryLst[pos]
-            updateUserAndEndTime(selectLaundry)
-
-            // 사용자 정보 업데이트
-            when {
-                selectLaundry.washerType.contains("WASHER") -> UserInfo.useLaundry = selectLaundry
-                selectLaundry.washerType.contains("DRYER") -> UserInfo.useDry = selectLaundry
-            }
-
-            onItemClick(selectLaundry)
-            holder.timerStart(selectLaundry) // 타이머 시작
-        }
-    }
-
-    private fun isUsedLaundry(view: View, laundry: Laundry, binding: ItemLaundryBinding): Boolean {
-        val context = view.context
-
-        return when {
-            laundry.user != null -> {
-                Toast.makeText(context, "이미 사용중인 유저가 있습니다", Toast.LENGTH_SHORT).show()
-                true
-            }
-            binding.laundTitle.text.contains("WASHER") && UserInfo.useLaundry != null -> {
-                Toast.makeText(context, "이미 사용중인 세탁기가 있습니다", Toast.LENGTH_SHORT).show()
-                true
-            }
-            binding.laundTitle.text.contains("DRYER") && UserInfo.useDry != null -> {
-                Toast.makeText(context, "이미 사용중인 건조기가 있습니다", Toast.LENGTH_SHORT).show()
-                true
-            }
-            else -> false
-        }
-    }
-
-    @RequiresApi(VERSION_CODES.O)
-    private fun updateUserAndEndTime(selectLaundry: Laundry) {
-        // 현재 시간에 사용자 지정 초를 더하는 방식으로 설정
-        selectLaundry.startTime = LocalDateTime.now().withNano(0).toString()
-        selectLaundry.endTime = LocalDateTime.now().withNano(0).plusSeconds(UserInfo.seconds.toLong()).toString()
-        selectLaundry.available = false
-        selectLaundry.user = UserInfo.userId
     }
 
     override fun onViewRecycled(holder: LaundryViewHolder) {

@@ -18,6 +18,7 @@ waveview = "1.0.0"
 waveviewVersion = "1.0.0"
 library = "0.3.5"
 lottie = "6.6.0"
+okhttp = "5.0.0-alpha.14"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +37,7 @@ waveview = { group = "com.github.onlynight", name = "WaveView", version.ref = "w
 gelitenight-waveview = { group = "com.gelitenight.waveview", name = "waveview", version.ref = "waveviewVersion" }
 library = { group = "me.itangqi.waveloadingview", name = "library", version.ref = "library" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

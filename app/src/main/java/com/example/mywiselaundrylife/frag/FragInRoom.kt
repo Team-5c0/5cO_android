@@ -51,7 +51,6 @@ class FragInRoom : Fragment() {
 
                 Log.d("requireTimer", "timer 갱신")
 
-                // 1분 대기
                 delay(1000)
                 Log.d("reset", "갱신")
             }
@@ -93,9 +92,7 @@ class FragInRoom : Fragment() {
             binding.recyclerview.layoutManager = GridLayoutManager(context, 3)
             binding.recyclerview.setHasFixedSize(true)
 
-            laundryAdapter = LaundryAdapter(UserInfo.userLaundryLst){ item ->
-                listener?.onItemClicked(item)
-            }
+            laundryAdapter = LaundryAdapter(UserInfo.userLaundryLst)
             binding.recyclerview.adapter = laundryAdapter
         } else{
             laundryAdapter.updateData()
