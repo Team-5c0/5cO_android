@@ -19,7 +19,7 @@ object RefreshData {
 
         ListData.laundryLst = ArrayList()
 
-        for(i in ListData.roomLst){
+        ListData.roomLst.forEach{ i ->
             washerRequest(i.roomid)
         }
     }
@@ -27,12 +27,12 @@ object RefreshData {
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun washerRequest(roomId : String){
         val washerResponse = LaundryRequestMananger.laundryRequest(roomId)
-        for(i in washerResponse!!){
-            i.roomId = roomId
-            if(i.user == UserInfo.userId){
-                when(i.washerType){
-                    "WASHER" -> UserInfo.useLaundry = i
-                    "DRYER" -> UserInfo.useDry = i
+        washerResponse!!.forEach { washer->
+            washer.roomId = roomId
+            if(washer.user == UserInfo.userId){
+                when(washer.washerType){
+                    "WASHER" -> UserInfo.useLaundry = washer
+                    "DRYER" -> UserInfo.useDry = washer
                 }
             }
         }

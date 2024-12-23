@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
+        android:name=".app.MyWiseLaundryLifeApp"
         android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
@@ -19,23 +20,27 @@
         android:theme="@style/Theme.MyWiseLaundryLife"
         tools:targetApi="31">
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="fcm_default_channel" />
+
         <service
             android:name=".serve.MyFirebaseMessagingService"
-            android:exported="true"
-            tools:ignore="WrongManifestParent">
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-
         <activity android:name=".act.FCMActivity"
             android:exported="false"
-            android:theme="@style/Theme.MyWiseLaundryLife"/>
+            android:theme="@style/Theme.MyWiseLaundryLife"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".act.StartActivity"
             android:exported="true"
-            android:theme="@style/Theme.MyWiseLaundryLife">
+            android:theme="@style/Theme.MyWiseLaundryLife.SplashScreen"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

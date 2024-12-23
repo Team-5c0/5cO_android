@@ -13,13 +13,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="학년반번호를 입력하세요"
+        android:textColor="@color/txt_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:textSize="20dp" />
 
-    <EditText
+    <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/inputId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +28,9 @@
         android:gravity="center"
         android:hint="ex) 1101"
         android:textSize="20dp"
-        android:text="1000"
+        android:backgroundTint="@color/txt_color"
+        android:textColor="@color/txt_color"
+        android:textCursorDrawable="@drawable/custom_cursor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/showText"
@@ -55,8 +58,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inputId"
-        android:background="@drawable/room_btn_background"
-        android:textColor="#000000"
+        android:background="@color/box_back"
+        android:textColor="@color/txt_color"
         android:text="로그인하기"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"

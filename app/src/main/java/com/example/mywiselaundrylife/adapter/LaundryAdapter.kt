@@ -35,6 +35,8 @@ class LaundryAdapter(
             // 이전 타이머 정지
             timerStop()
 
+            binding.prgBar.startAnimation()
+
             Log.d("timer", "${selectLaundry}")
             if(selectLaundry.washerType == "DRYER"){
                 binding.windLottie.setAnimation(R.raw.using_animation)
@@ -165,12 +167,10 @@ class LaundryAdapter(
             }
         }
 
-        binding.laundTitle.text = laundry.washerType
-
-        if(binding.laundTitle.text == "WASHER"){
+        if(laundry.washerType == "WASHER"){
             binding.windLottie.visibility = View.INVISIBLE
             binding.prgBar.visibility = View.VISIBLE
-        }else if(binding.laundTitle.text == "DRYER") {
+        }else if(laundry.washerType == "DRYER") {
             binding.prgBar.visibility = View.INVISIBLE
             binding.windLottie.visibility = View.VISIBLE
         }

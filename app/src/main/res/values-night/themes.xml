@@ -1,14 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MyWiseLaundryLife" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
+    <!-- SplashScreen 테마 -->
+    <style name="Theme.MyWiseLaundryLife.SplashScreen" parent="Theme.SplashScreen">
+        <!-- 스플래시 화면 배경과 아이콘 설정 -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/img</item>
+        <item name="postSplashScreenTheme">@style/Theme.MyWiseLaundryLife</item>
+    </style>
+
+    <!-- 일반 화면에 사용할 AppCompat 기반 테마 -->
+    <style name="Theme.MyWiseLaundryLife" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryVariant">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="backgroundColor">#1D1D1D</item>
+        <item name="colorSurface">#000000</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowBackground">#1F1F1F</item>
-        <item name="textColor">#FFFFFF</item>
+        <item name="android:windowBackground">#1D1D1D</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
         <item name="android:fontFamily">@font/noto_snas_kr_medium</item>
         <item name="android:includeFontPadding">false</item>
     </style>
-
-    <style name="Theme.MyWiseLaundryLife" parent="Base.Theme.MyWiseLaundryLife" />
 </resources>

@@ -48,6 +48,8 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
+        Log.d("login", "${UserInfo.useLaundry}")
+
         enableEdgeToEdge()
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -56,12 +58,11 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
             insets
         }
 
-        if (UserInfo.useLaundry != null) {
-            startTimer(UserInfo.useLaundry!!)
-            Log.d("userId", "${UserInfo.useLaundry}")
+        UserInfo.useLaundry?.let {
+            startTimer(it)
         }
-        if (UserInfo.useDry != null){
-            startTimer(UserInfo.useDry!!)
+        UserInfo.useDry?.let{
+            startTimer(it)
         }
 
         binding.remainWashersTxt.text = remainWasherSum()
@@ -85,15 +86,16 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
         binding.logOutBtn.setOnClickListener {
             editor.remove("isLogin")
+            editor.remove("myId")
             editor.apply()
 
             // 내가 사용하고 있는 세탁기 종료하기
-            if(UserInfo.useLaundry != null){
-                timerStop(UserInfo.useLaundry!!)
+            UserInfo.useLaundry?.let{
+                timerStop(it)
                 UserInfo.useLaundry = null
             }
-            if(UserInfo.useDry != null){
-                timerStop(UserInfo.useDry!!)
+            UserInfo.useDry?.let{
+                timerStop(it)
                 UserInfo.useDry = null
             }
 
@@ -122,14 +124,14 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
                 "WASHER" -> {
                     if (remainWasherLst[0] == null) {
                         remainWasherLst[0] = "${wash.roomId} 세탁기${wash.washerId}"
-                    } else {
+                    }else{
                         remainSumLst[0]++
                     }
                 }
                 "DRYER" -> {
-                    if (remainWasherLst[1] == null) {
+                    if(remainWasherLst[1]== null) {
                         remainWasherLst[1] = "${wash.roomId} 건조기${wash.washerId}"
-                    } else {
+                    }else{
                         remainSumLst[1]++
                     }
                 }
@@ -139,50 +141,39 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
         val (washer, dryer) = remainWasherLst
         val (washerSum, dryerSum) = remainSumLst
 
-        return when {
-            washer != null && dryer != null -> {
-                val washerMessage = if (washerSum != 0) "세탁기 ${washerSum}대" else null
-                val dryerMessage = if (dryerSum != 0) "건조기 ${dryerSum}대" else null
+        return washerTxt(washer, dryer, washerSum, dryerSum)
+    }
 
-                when {
-                    washerMessage != null && dryerMessage != null ->
-                        "$washer, $dryer 이외에도 $washerMessage, $dryerMessage 사용가능해요"
-                    washerMessage != null ->
-                        "$washer, $dryer 이외에도 $washerMessage 사용가능해요"
-                    dryerMessage != null ->
-                        "$washer, $dryer 이외에도 $dryerMessage 사용가능해요"
-                    else ->
-                        "$washer, $dryer 사용가능해요"
-                }
+    private fun washerTxt(washer : String?, dryer : String?, washerSum : Int, dryerSum : Int) : String{
+
+        Log.d("washerSum", "$washer $dryer $washerSum $dryerSum")
+
+        return buildString {
+            when{
+                washer != null && dryer != null -> append("$washer, $dryer")
+                washer != null -> append(washer)
+                dryer != null -> append(dryer)
+                else -> return "사용가능한 세탁 & 건조기가 없어요"
             }
 
-            washer != null -> {
-                if (washerSum != 0)
-                    "$washer 이외에도 세탁기 ${washerSum}대 사용가능해요"
-                else
-                    "$washer 사용가능해요"
+            when{
+                washerSum != 0 && dryerSum != 0 -> append(" 이외에도 세탁기 ${washerSum}대 건조기 ${dryerSum}대를 사용가능해요")
+                washerSum != 0 -> append(" 이외에도 세탁기 ${washerSum}대를 사용가능해요")
+                dryerSum != 0 -> append(" 이외에도 건조기 ${dryerSum}대를 사용가능해요")
+                else -> append("을 사용가능해요")
             }
-
-            dryer != null -> {
-                if (dryerSum != 0)
-                    "$dryer 이외에도 건조기 ${dryerSum}대 사용가능해요"
-                else
-                    "$dryer 사용가능해요"
-            }
-
-            else -> "사용가능한 세탁 & 건조기가 없어요"
         }
     }
 
-    // 인터페이스 구현: 아이템 클릭 시 TextView 업데이트
     override fun onItemClicked(item : Laundry) { // startTimer
         startTimer(item)  // TextView 업데이트
         Toast.makeText(this, "${item.washerType} 선택됨", Toast.LENGTH_SHORT).show()
     }
 
     fun startTimer(selectLaundry : Laundry){
+        Log.d("startTimer", "start : ${selectLaundry}")
         when(selectLaundry.washerType){
-            "WASHER" -> {startLaundry(selectLaundry)}
+            "WASHER" -> startLaundry(selectLaundry)
             "DRYER" -> startDryer(selectLaundry)
         }
     }
@@ -196,7 +187,8 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
                     val now = LocalDateTime.now()
 
                     // endTime이 null인지 확인
-                    if (selectLaundry.endTime == null) {
+                    if(selectLaundry.endTime == null) {
+                        Log.d("startTimer", "stop : ${selectLaundry}")
                         binding.laundryTime.text = "-- : --"
                         timerStop(selectLaundry)
                         return
@@ -208,6 +200,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
                     if (duration.isNegative || duration.isZero) {
                         onTimerEnd(selectLaundry, selectLaundry.washerType)
                     } else {
+                        Log.d("startTimer", "update : ${selectLaundry}")
                         updateTimer(selectLaundry, duration)  // 타이머 업데이트
                         handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
                     }
@@ -228,7 +221,7 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
                     val now = LocalDateTime.now().withNano(0)
 
                     // endTime이 null인지 확인
-                    if (selectLaundry.endTime == null) {
+                    if(selectLaundry.endTime == null) {
                         binding.dryerTime.text = "-- : --"
                         timerStop(selectLaundry)
                         return
@@ -299,37 +292,37 @@ class FCMActivity : AppCompatActivity(), OnItemClickListener {
 
     override fun onBackPressed() {
         Log.d("mine", "${supportFragmentManager.backStackEntryCount}")
-        if (backPressedTime + 2000 > System.currentTimeMillis() && supportFragmentManager.backStackEntryCount <= 0) {
+        when{
+            backPressedTime + 2000 > System.currentTimeMillis() && supportFragmentManager.backStackEntryCount <= 0 ->{
+                // 내가 사용하고 있는 세탁기 종료하기
+                UserInfo.useLaundry?.let{
+                    timerStop(it)
+                    UserInfo.useLaundry = null
+                }
+                UserInfo.useDry?.let{
+                    timerStop(it)
+                    UserInfo.useDry = null
+                }
 
-            // 내가 사용하고 있는 세탁기 종료하기
-            if(UserInfo.useLaundry != null){
-                timerStop(UserInfo.useLaundry!!)
-                UserInfo.useLaundry = null
+                UserInfo.userId = null
+
+                super.onBackPressed()
+                return
             }
-            if(UserInfo.useDry != null){
-                timerStop(UserInfo.useDry!!)
-                UserInfo.useDry = null
+            supportFragmentManager.backStackEntryCount > 0 -> {
+                supportFragmentManager.popBackStack()
             }
-
-            UserInfo.userId = null
-
-            super.onBackPressed()
-            return
-        } else if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
-        } else {
-            Toast.makeText(this, "뒤로 버튼을 한 번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show()
+            else -> Toast.makeText(this, "뒤로 버튼을 한 번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show()
         }
         backPressedTime = System.currentTimeMillis()
     }
 
     @RequiresApi(VERSION_CODES.O)
     fun updateView(){
-        if (UserInfo.useLaundry != null) {
-            startTimer(UserInfo.useLaundry!!)
-        }
-        if (UserInfo.useDry != null){
-            startTimer(UserInfo.useDry!!)
+        listOf(UserInfo.useLaundry, UserInfo.useDry).forEach { washer ->
+            washer?.let{
+                startTimer(it)
+            }
         }
         binding.remainWashersTxt.text = remainWasherSum()
     }

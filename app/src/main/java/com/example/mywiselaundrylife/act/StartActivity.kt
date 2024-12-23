@@ -1,5 +1,6 @@
 package com.example.mywiselaundrylife.act
 
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -10,9 +11,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +35,7 @@ class StartActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityStartBinding
     private val inputRegex: Pattern = Pattern.compile("[1-3][1-4][0-1][0-9]")
+    private lateinit var editor : SharedPreferences.Editor
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 5000
@@ -41,6 +45,21 @@ class StartActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val splashScreen = installSplashScreen()
+
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+
+        if (sharedPreferences.getBoolean("isLogin", false)){
+            loginRequest(userId = sharedPreferences.getInt("myId", 0)){success ->
+                if(success){
+                    Log.d("login", "${UserInfo.userId}")
+                }
+            }
+        }
+
+        splashScreen.setKeepOnScreenCondition { false }
 
         binding = ActivityStartBinding.inflate(layoutInflater)
 
@@ -55,49 +74,51 @@ class StartActivity : AppCompatActivity() {
         setFCMToken()
         permissionCheck()
 
-        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
-
         binding.toInBtn.setOnClickListener{
+            binding.toInBtn.isEnabled = false
             when{
                 binding.inputId.text.isNullOrBlank()->{
+                    binding.toInBtn.isEnabled = true
                     Log.d("myTag", "빈칸 입력해줘")
                     showError("빈칸을 입력해주세요")
                 }
                 else->{
-                    loginRequest()
+                    val inputId = binding.inputId.text.toString().toInt()
+                    loginRequest(inputId){ success ->
+                        if (success){
+                            editor.putInt("myId", inputId)
+                            editor.putBoolean("isLogin", true)
+                            editor.apply()
+                        }
+                    }
                 }
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun loginRequest(){
+    private fun loginRequest(userId : Int, callback : (Boolean) -> Unit){
         lifecycleScope.launch {
             try{
-                // sharedPreference 편집
-//                val editor = sharedPreferences.edit()
 
-                val loginResponse = AuthRequestManager.loginRequest(binding.inputId.text.toString().toInt())
+                val loginResponse = AuthRequestManager.loginRequest(userId)
 
                 UserInfo.token = loginResponse.body()?.token
-                UserInfo.userId = binding.inputId.text.toString().toInt()
+                UserInfo.userId = userId
                 Log.d("userId", "${UserInfo.userId}")
-
-//                editor.putInt("myId", binding.inputId.text.toString().toInt())
-//                editor.putString("myToken", loginResponse.body()?.token)
-//                editor.putBoolean("isLogin", true)
-//                editor.apply()
-
                 roomRequest()
-
                 binding.errorText.visibility = View.GONE
-
+                callback(true)
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
                 showError("로그인에 실패하였습니다")
+                callback(false)
+                binding.toInBtn.isEnabled = true
             } catch (e : Exception){
                 Log.e("mine", "${e.message}")
                 showError("대부분 버그이무니다")
+                callback(false)
+                binding.toInBtn.isEnabled = true
             }
         }
     }
@@ -106,14 +127,13 @@ class StartActivity : AppCompatActivity() {
     private fun roomRequest(){
         lifecycleScope.launch {
             try {
-
                 RefreshData.roomRequest()
 
                 fcmTokenRequest(UserInfo.userId!!, UserInfo.FCMtoken!!)
 
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
-                showError("방 못 받아옴.")
+                showError("방 못 받아옴")
             } catch (e : Exception){
                 Log.e("mine", "${e.message}")
                 showError("대부분 버그이무니다")
@@ -126,11 +146,12 @@ class StartActivity : AppCompatActivity() {
             try {
                 val FCMResponse = AuthRequestManager.fcmTokenRequest(userId, fcmToken)
 
+                binding.toInBtn.isEnabled = true
                 startMainActivity()
 
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
-                showError("ㅋㅋ뭔가 버그남")
+                showError("파이어베이스 토큰 보내기 실패")
             } catch (e : Exception){
                 Log.e("mine","${e.message}")
                 showError("대부분 버그이무니다")
@@ -159,10 +180,10 @@ class StartActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSION_REQUEST_CODE -> {
-                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(applicationContext, "권한이 허용되지 않음", Toast.LENGTH_SHORT).show()
-                } else {
+                if (grantResults.isEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(applicationContext, "권한이 허용됨", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "권한이 허용되지 않음", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -178,21 +199,19 @@ class StartActivity : AppCompatActivity() {
             UserInfo.FCMtoken = token
             val msg = "FCM Registration token: $token"
             Log.d("mine", msg)
-            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
         })
     }
 
     private fun permissionCheck() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permissionCheck = ContextCompat.checkSelfPermission(
-                this, android.Manifest.permission.POST_NOTIFICATIONS
+                this, Manifest.permission.POST_NOTIFICATIONS
             )
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(
-                    this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), PERMISSION_REQUEST_CODE
+                    this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), PERMISSION_REQUEST_CODE
                 )
             }
         }
     }
-
 }

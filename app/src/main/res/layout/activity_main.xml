@@ -39,10 +39,10 @@
 
     <ImageView
         android:id="@+id/timerImg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginStart="20dp"
-        android:background="@drawable/baseline_access_time_24"
+        android:background="@drawable/timer_img"
         android:scaleType="centerCrop"
         android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,6 +55,7 @@
         android:text="내 빨래"
         android:textStyle="bold"
         android:textSize="16sp"
+        android:textColor="@color/txt_color"
         app:layout_constraintBottom_toBottomOf="@id/timerImg"
         app:layout_constraintStart_toEndOf="@id/timerImg"
         app:layout_constraintTop_toTopOf="@id/timerImg"
@@ -90,6 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="세탁"
+                android:textColor="@color/txt_color"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
 
@@ -100,6 +102,7 @@
                 android:layout_weight="1"
                 android:gravity="start"
                 android:text="-- : --"
+                android:textColor="@color/txt_color"
                 android:textSize="18sp"
                 android:textStyle="bold"/>
         </LinearLayout>
@@ -121,6 +124,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="건조"
+                android:textColor="@color/txt_color"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
 
@@ -131,6 +135,7 @@
                 android:layout_weight="1"
                 android:gravity="start"
                 android:text="-- : --"
+                android:textColor="@color/txt_color"
                 android:textSize="18sp"
                 android:textStyle="bold"/>
         </LinearLayout>
@@ -140,7 +145,7 @@
         android:id="@+id/washerImg"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@drawable/baseline_local_laundry_service_24"
+        android:background="@drawable/washer_logo"
         app:layout_constraintTop_toBottomOf="@id/fastBack"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="20dp"
@@ -153,6 +158,7 @@
         android:text="세탁실 선택"
         android:textStyle="bold"
         android:textSize="16sp"
+        android:textColor="@color/txt_color"
         app:layout_constraintBottom_toBottomOf="@id/washerImg"
         app:layout_constraintStart_toEndOf="@id/washerImg"
         app:layout_constraintTop_toTopOf="@id/washerImg"
@@ -180,6 +186,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="16sp"
+            android:textColor="@color/txt_color"
             android:textStyle="bold"
             android:text="바로 사용 가능한 세탁, 건조기는?"/>
         <TextView
@@ -188,7 +195,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="12sp"
-            android:textColor="#464646"
+            android:textColor="@color/txt_color"
             android:text="2층 세탁실 세탁기1, 3층 세탁실 건조기2, 이외에도 세탁기 3대, 건조기 2대 사용가능해요"/>
     </LinearLayout>
 

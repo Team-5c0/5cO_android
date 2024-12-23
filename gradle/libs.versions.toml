@@ -19,6 +19,7 @@ waveviewVersion = "1.0.0"
 library = "0.3.5"
 lottie = "6.6.0"
 okhttp = "5.0.0-alpha.14"
+firebaseMessagingVersion = "24.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,6 +39,7 @@ gelitenight-waveview = { group = "com.gelitenight.waveview", name = "waveview", 
 library = { group = "me.itangqi.waveloadingview", name = "library", version.ref = "library" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+google-firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessagingVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -97,7 +97,6 @@ class FragInRoom : Fragment() {
         } else{
             laundryAdapter.updateData()
         }
-//        binding.currentRoom.text = "현재 세탁실 : ${UserInfo.currentRoom}"
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

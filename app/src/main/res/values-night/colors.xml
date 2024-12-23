@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#FF000000</color>
+    <color name="selectBtn">#2F2F2F</color>
+    <color name="notSelectBtn">#FFFFFF</color>
+    <color name="box_back">#2F2F2F</color>
+    <color name="txt_color">#FFFFFF</color>
+    <color name="cursor_color">#767676</color>
+</resources>

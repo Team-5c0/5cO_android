@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="selectBtn">#0B1328</color>
     <color name="notSelectBtn">#FFFFFF</color>
+    <color name="box_back">#FFFFFF</color>
+    <color name="txt_color">#000000</color>
+    <color name="cursor_color">#767676</color>
 </resources>
