@@ -1,11 +1,10 @@
-package com.example.mywiselaundrylife.activity
+package com.example.mywiselaundrylife.data.laundry
 
 import android.util.Log
-import com.example.mywiselaundrylife.data.laundry.LaundryRequestManager
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.user.UserInfo.lstData
 
-object RefreshData {
+object LaundryDataUpdater {
 
     suspend fun roomRequest() {
         val roomResponse = LaundryRequestManager.roomsRequest("Bearer ${UserInfo.token!!}")

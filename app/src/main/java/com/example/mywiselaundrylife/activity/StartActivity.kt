@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.auth.AuthRequestManager
+import com.example.mywiselaundrylife.data.laundry.LaundryDataUpdater
 import com.example.mywiselaundrylife.databinding.ActivityStartBinding
 import com.example.mywiselaundrylife.viewmodel.StartActVM
 import com.google.android.gms.tasks.OnCompleteListener
@@ -145,7 +146,7 @@ class StartActivity : AppCompatActivity() {
     }
 
     private suspend fun roomRequest() {
-        RefreshData.roomRequest()
+        LaundryDataUpdater.roomRequest()
         fcmTokenRequest(UserInfo.userId!!, UserInfo.FCMToken!!)
     }
 

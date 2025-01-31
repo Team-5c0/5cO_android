@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.mywiselaundrylife.activity.FCMActivity
-import com.example.mywiselaundrylife.activity.RefreshData
+import com.example.mywiselaundrylife.data.laundry.LaundryDataUpdater
 import com.example.mywiselaundrylife.adapter.LaundryAdapter
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.base.Laundry
@@ -32,7 +32,7 @@ class FragmentInRoom : Fragment() {
 
                 setRecyclerView()
 
-                RefreshData.roomRequest()
+                LaundryDataUpdater.roomRequest()
 
                 // MainActivity 뷰 갱신
                 (activity as? FCMActivity)?.updateView()
