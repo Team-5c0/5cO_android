@@ -13,5 +13,13 @@ object UserInfo {
     var userLaundryLst = arrayListOf<Laundry>()
     var currentRoom : String = ""
 
-    var seconds = 10
+    fun resetUserInfo(){
+        userId = null
+        useLaundry = null
+        useDry = null
+        token = null
+        FCMtoken = null
+        userLaundryLst = arrayListOf<Laundry>()
+        currentRoom = ""
+    }
 }

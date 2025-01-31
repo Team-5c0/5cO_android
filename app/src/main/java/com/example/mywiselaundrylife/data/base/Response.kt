@@ -1,7 +1,5 @@
 package com.example.mywiselaundrylife.data.base
 
-import java.time.LocalDateTime
-
 data class LoginResponse(
     val token : String,
     val tokenType : String

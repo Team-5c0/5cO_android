@@ -19,57 +19,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/laundryTable"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:text="세탁실"
         android:textColor="@color/selectBtn"
-        android:textSize="16sp"
+        android:textSize="@dimen/small"
         android:gravity="center"/>
-
-    <LinearLayout
-        android:id="@+id/laundryTable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:weightSum="2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/dryerTable"
-        android:visibility="gone">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="남은 세탁기 : "
-            android:gravity="end"/>
-        <TextView
-            android:id="@+id/remainLaundryTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="0"
-            android:gravity="center"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/dryerTable"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:weightSum="2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="gone">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="남은 건조기 : "
-            android:gravity="end"/>
-        <TextView
-            android:id="@+id/remainDryerTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="0"
-            android:gravity="center"/>
-    </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

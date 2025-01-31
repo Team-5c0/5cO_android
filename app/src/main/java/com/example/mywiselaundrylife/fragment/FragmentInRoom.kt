@@ -1,4 +1,4 @@
-package com.example.mywiselaundrylife.frag
+package com.example.mywiselaundrylife.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,13 +20,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class FragInRoom : Fragment() {
+class FragmentInRoom : Fragment() {
 
     private lateinit var binding: FragmentLaundryBinding
     private lateinit var laundryAdapter: LaundryAdapter
     private var job: Job? = null
 
-    fun startCoroutineTimer() {
+    private fun startCoroutineTimer() {
         job = CoroutineScope(Dispatchers.Main).launch {
             while (isActive) {
 
@@ -42,7 +42,7 @@ class FragInRoom : Fragment() {
         }
     }
 
-    fun stopCoroutineTimer() {
+    private fun stopCoroutineTimer() {
         job?.cancel() // 코루틴 중지
     }
 

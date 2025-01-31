@@ -3,6 +3,7 @@ package com.example.mywiselaundrylife.data.auth
 import android.util.Log
 import com.example.mywiselaundrylife.data.base.FCMResponse
 import com.example.mywiselaundrylife.data.base.LoginResponse
+import com.google.firebase.ktx.BuildConfig
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -11,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 object AuthRequestManager {
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://43.201.132.136:8081/")
+        .baseUrl("http://43.201.18.90:8081/")
         .client(
             OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)

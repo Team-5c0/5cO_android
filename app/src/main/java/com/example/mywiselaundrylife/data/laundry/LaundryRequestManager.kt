@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-object LaundryRequestMananger {
+object LaundryRequestManager {
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://43.201.18.90:8081/")
         .client(

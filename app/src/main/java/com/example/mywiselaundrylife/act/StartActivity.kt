@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,21 +19,18 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.mywiselaundrylife.R
-import com.example.mywiselaundrylife.data.laundry.LaundryRequestMananger
-import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.auth.AuthRequestManager
 import com.example.mywiselaundrylife.databinding.ActivityStartBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
-import java.util.regex.Pattern
+import java.net.SocketTimeoutException
 
 class StartActivity : AppCompatActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityStartBinding
-    private val inputRegex: Pattern = Pattern.compile("[1-3][1-4][0-1][0-9]")
     private lateinit var editor : SharedPreferences.Editor
 
     companion object {
@@ -42,9 +38,7 @@ class StartActivity : AppCompatActivity() {
         private const val TAG = "FCMActivity"
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
         val splashScreen = installSplashScreen()
 
@@ -60,8 +54,8 @@ class StartActivity : AppCompatActivity() {
         }
 
         splashScreen.setKeepOnScreenCondition { false }
-
         binding = ActivityStartBinding.inflate(layoutInflater)
+        super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
         setContentView(binding.root)
@@ -73,6 +67,14 @@ class StartActivity : AppCompatActivity() {
 
         setFCMToken()
         permissionCheck()
+
+        binding.inputId.setOnFocusChangeListener{v, hasFocus ->
+            if(hasFocus){
+                binding.inputId.hint = ""
+            } else{
+                binding.inputId.hint = "ex) 1101"
+            }
+        }
 
         binding.toInBtn.setOnClickListener{
             binding.toInBtn.isEnabled = false
@@ -96,11 +98,9 @@ class StartActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun loginRequest(userId : Int, callback : (Boolean) -> Unit){
         lifecycleScope.launch {
             try{
-
                 val loginResponse = AuthRequestManager.loginRequest(userId)
 
                 UserInfo.token = loginResponse.body()?.token
@@ -109,21 +109,26 @@ class StartActivity : AppCompatActivity() {
                 roomRequest()
                 binding.errorText.visibility = View.GONE
                 callback(true)
+
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
                 showError("로그인에 실패하였습니다")
                 callback(false)
                 binding.toInBtn.isEnabled = true
+            } catch(e : SocketTimeoutException){
+                    Log.e("mine", "${e.message}")
+                    showError("요청 시간이 초과되었습니다")
+                    callback(false)
+                    binding.toInBtn.isEnabled = true
             } catch (e : Exception){
                 Log.e("mine", "${e.message}")
-                showError("대부분 버그이무니다")
+                showError("알 수 없는 오류가 발생하였습니다.")
                 callback(false)
                 binding.toInBtn.isEnabled = true
             }
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun roomRequest(){
         lifecycleScope.launch {
             try {
@@ -134,9 +139,15 @@ class StartActivity : AppCompatActivity() {
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
                 showError("방 못 받아옴")
+                binding.toInBtn.isEnabled = true
+            } catch(e : SocketTimeoutException){
+                Log.e("mine", "${e.message}")
+                showError("요청 시간이 초과되었습니다")
+                binding.toInBtn.isEnabled = true
             } catch (e : Exception){
                 Log.e("mine", "${e.message}")
-                showError("대부분 버그이무니다")
+                showError("알 수 없는 오류가 발생하였습니다.")
+                binding.toInBtn.isEnabled = true
             }
         }
     }
@@ -144,17 +155,23 @@ class StartActivity : AppCompatActivity() {
     private fun fcmTokenRequest(userId : Int, fcmToken : String){
         lifecycleScope.launch {
             try {
-                val FCMResponse = AuthRequestManager.fcmTokenRequest(userId, fcmToken)
+                AuthRequestManager.fcmTokenRequest(userId, fcmToken)
 
                 binding.toInBtn.isEnabled = true
                 startMainActivity()
 
             } catch (e : retrofit2.HttpException){
                 Log.e("mine", "${e.message}")
-                showError("파이어베이스 토큰 보내기 실패")
-            } catch (e : Exception){
+                showError("파이어베이스 토큰 보내기가 실패하였습니다.")
+                binding.toInBtn.isEnabled = true
+            } catch(e : SocketTimeoutException){
+                Log.e("mine", "${e.message}")
+                showError("요청 시간이 초과되었습니다")
+                binding.toInBtn.isEnabled = true
+            }  catch (e : Exception){
                 Log.e("mine","${e.message}")
-                showError("대부분 버그이무니다")
+                showError("알 수 없는 오류가 발생하였습니다.")
+                binding.toInBtn.isEnabled = true
             }
         }
     }
@@ -181,9 +198,9 @@ class StartActivity : AppCompatActivity() {
         when (requestCode) {
             PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(applicationContext, "권한이 허용됨", Toast.LENGTH_SHORT).show()
-                } else {
                     Toast.makeText(applicationContext, "권한이 허용되지 않음", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "권한이 허용됨", Toast.LENGTH_SHORT).show()
                 }
             }
         }

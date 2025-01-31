@@ -37,12 +37,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("mine", "${token}")
-        sendRegistrationToServer(token)
-    }
-
-    private fun sendRegistrationToServer(token: String?) {
-        Log.d(TAG, "sendRegistrationTokenToServer($token)")
     }
 
     @SuppressLint("RemoteViewLayout")

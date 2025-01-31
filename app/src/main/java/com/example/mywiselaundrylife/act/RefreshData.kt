@@ -1,18 +1,14 @@
 package com.example.mywiselaundrylife.act
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
-import com.example.mywiselaundrylife.data.base.Laundry
-import com.example.mywiselaundrylife.data.laundry.LaundryRequestMananger
+import com.example.mywiselaundrylife.data.laundry.LaundryRequestManager
 import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.data.user.UserInfo
 
 object RefreshData {
 
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun roomRequest(){
-        val roomResponse = LaundryRequestMananger.roomsRequest("Bearer ${UserInfo.token!!}")
+        val roomResponse = LaundryRequestManager.roomsRequest("Bearer ${UserInfo.token!!}")
         ListData.roomLst = roomResponse!!
 
         Log.d("room", "${ListData.roomLst}")
@@ -24,9 +20,8 @@ object RefreshData {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun washerRequest(roomId : String){
-        val washerResponse = LaundryRequestMananger.laundryRequest(roomId)
+        val washerResponse = LaundryRequestManager.laundryRequest(roomId)
         washerResponse!!.forEach { washer->
             washer.roomId = roomId
             if(washer.user == UserInfo.userId){

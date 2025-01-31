@@ -18,16 +18,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="20dp" />
+        android:textSize="@dimen/big" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/inputId"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:hint="ex) 1101"
-        android:textSize="20dp"
+        android:textSize="@dimen/big"
         android:backgroundTint="@color/txt_color"
         android:textColor="@color/txt_color"
         android:textCursorDrawable="@drawable/custom_cursor"
@@ -48,6 +48,7 @@
         app:layout_constraintBottom_toTopOf="@+id/toInBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:textSize="@dimen/tiny"
         android:visibility="gone"/>
 
     <androidx.appcompat.widget.AppCompatButton
@@ -58,12 +59,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inputId"
-        android:background="@color/box_back"
+        android:background="@drawable/box_container"
         android:textColor="@color/txt_color"
         android:text="로그인하기"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp"/>
+        android:paddingEnd="20dp"
+        android:textSize="@dimen/tiny"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
