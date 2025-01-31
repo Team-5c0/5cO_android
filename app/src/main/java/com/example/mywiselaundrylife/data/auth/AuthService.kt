@@ -14,7 +14,7 @@ interface AuthService {
 
     @POST("/register-fcm-token")
     suspend fun fcmToken(
-        @Query("userId") userId: Int,
+        @Query("userId") userId : Int,
         @Query("fcmToken") fcmToken : String
     ) : Response<FCMResponse>
 

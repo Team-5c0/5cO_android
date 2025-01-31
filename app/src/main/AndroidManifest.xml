@@ -25,19 +25,19 @@
             android:value="fcm_default_channel" />
 
         <service
-            android:name=".serve.MyFirebaseMessagingService"
+            android:name=".service.MyFirebaseMessagingService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <activity android:name=".act.FCMActivity"
+        <activity android:name=".activity.FCMActivity"
             android:exported="false"
             android:theme="@style/Theme.MyWiseLaundryLife"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".act.StartActivity"
+            android:name=".activity.StartActivity"
             android:exported="true"
             android:theme="@style/Theme.MyWiseLaundryLife.SplashScreen"
             android:screenOrientation="portrait">

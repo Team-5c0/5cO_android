@@ -1,4 +1,4 @@
-package com.example.mywiselaundrylife.act
+package com.example.mywiselaundrylife.activity
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -15,11 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.adapter.LaundryRoomAdapter
 import com.example.mywiselaundrylife.data.user.UserInfo
-import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.databinding.ActivityMainBinding
 import com.example.mywiselaundrylife.fragment.FragmentInRoom
-import com.example.mywiselaundrylife.serve.CustomSnapHelper
-import com.example.mywiselaundrylife.vw.FCMActVM
+import com.example.mywiselaundrylife.service.CustomSnapHelper
+import com.example.mywiselaundrylife.viewmodel.FCMActVM
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class FCMActivity : AppCompatActivity() {
@@ -27,7 +27,7 @@ class FCMActivity : AppCompatActivity() {
     private var backPressedTime: Long = 0
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityMainBinding
-    private val viewModel : FCMActVM by viewModels()
+    private val viewModel: FCMActVM by viewModels()
 
     private val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
@@ -45,22 +45,19 @@ class FCMActivity : AppCompatActivity() {
             insets
         }
 
-        UserInfo.currentRoom = ListData.roomLst[0].roomid
+        UserInfo.currentRoom = UserInfo.lstData.roomLst[0].roomid
 
         binding.roomFrame.layoutManager = layoutManager
         binding.roomFrame.setHasFixedSize(true)
-        binding.roomFrame.adapter = LaundryRoomAdapter(
-            ListData.roomLst,
+        binding.roomFrame.adapter = LaundryRoomAdapter(UserInfo.lstData.roomLst,
             viewModel = viewModel,
             onItemClick = { getRoom ->
                 UserInfo.currentRoom = getRoom.roomid
 
                 // fragment 재호출
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.laundryFrame, FragmentInRoom())
-                    .commit()
-            }
-        )
+                    .replace(R.id.laundryFrame, FragmentInRoom()).commit()
+            })
 
         val pagerSnapHelper = CustomSnapHelper()
         pagerSnapHelper.attachToRecyclerView(binding.roomFrame)
@@ -80,21 +77,27 @@ class FCMActivity : AppCompatActivity() {
         }
 
         if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.laundryFrame, FragmentInRoom())
+            supportFragmentManager.beginTransaction().replace(R.id.laundryFrame, FragmentInRoom())
                 .commit()
         }
 
         lifecycleScope.launch {
             viewModel.remainWasherSum()
-            binding.laundryTime.text = viewModel.laundryTimeTxt.value
-            binding.dryerTime.text = viewModel.dryerTimeTxt.value
-            binding.remainWashersTxt.text = viewModel.remainWasherTxt.value
+
+            viewModel.laundryTimeTxt.collectLatest { value ->
+                binding.laundryTime.text = value
+            }
+            viewModel.dryerTimeTxt.collectLatest { value ->
+                binding.dryerTime.text = value
+            }
+            viewModel.remainWasherTxt.collectLatest { value ->
+                binding.remainWashersTxt.text = value
+            }
 
             UserInfo.useLaundry?.let {
                 viewModel.startLaundry(it)
             }
-            UserInfo.useDry?.let{
+            UserInfo.useDry?.let {
                 viewModel.startLaundry(it)
             }
         }
@@ -102,36 +105,38 @@ class FCMActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         Log.d("mine", "${supportFragmentManager.backStackEntryCount}")
-        when{
-            backPressedTime + 2000 > System.currentTimeMillis() && supportFragmentManager.backStackEntryCount <= 0 ->{
+        when {
+            backPressedTime + 2000 > System.currentTimeMillis() && supportFragmentManager.backStackEntryCount <= 0 -> {
 
                 logOut()
 
                 super.onBackPressed()
                 return
             }
+
             supportFragmentManager.backStackEntryCount > 0 -> {
                 supportFragmentManager.popBackStack()
             }
+
             else -> Toast.makeText(this, "뒤로 버튼을 한 번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show()
         }
         backPressedTime = System.currentTimeMillis()
     }
 
-    fun updateView(){
+    fun updateView() {
         listOf(UserInfo.useLaundry, UserInfo.useDry).forEach { washer ->
-            washer?.let{
+            washer?.let {
                 viewModel.startLaundry(it)
             }
         }
         viewModel.remainWasherSum()
     }
 
-    fun logOut(){
-        UserInfo.useLaundry?.let{
+    private fun logOut() {
+        UserInfo.useLaundry?.let {
             viewModel.timerStop(it)
         }
-        UserInfo.useDry?.let{
+        UserInfo.useDry?.let {
             viewModel.timerStop(it)
         }
 

@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mywiselaundrylife.R
-import com.example.mywiselaundrylife.data.WasherDiffUtil
+import com.example.mywiselaundrylife.diffutil.WasherDiffUtil
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.base.Laundry
 import com.example.mywiselaundrylife.databinding.ItemLaundryBinding
@@ -22,9 +22,10 @@ class LaundryAdapter(
 
     private val viewHolders = mutableListOf<LaundryViewHolder>()
 
-    inner class LaundryViewHolder(val binding: ItemLaundryBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class LaundryViewHolder(val binding: ItemLaundryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         private val handler = Handler(Looper.getMainLooper())
-        var runnable: Runnable? = null
+        private var runnable: Runnable? = null
 
         fun timerStart(selectLaundry: Laundry) {
             // 이전 타이머 정지
@@ -96,7 +97,8 @@ class LaundryAdapter(
             val hours = duration.toHours()
             val minutes = (duration.toMinutes() % 60)
 
-            val progress = ((elapsedDuration.toDouble() / totalDuration) * 1000).toInt().coerceIn(0, 1000)
+            val progress =
+                ((elapsedDuration.toDouble() / totalDuration) * 1000).toInt().coerceIn(0, 1000)
             binding.prgBar.progress = progress
             binding.remainTimeTxt.text = String.format("%02d : %02d", hours, minutes)
         }
@@ -105,7 +107,7 @@ class LaundryAdapter(
             binding.remainTimeTxt.text = "00 : 00"
             timerStop()  // 타이머 정지
 
-            if(selectLaundry.user == UserInfo.userId){
+            if (selectLaundry.user == UserInfo.userId) {
                 when {
                     laundryType.contains("WASHER") -> UserInfo.useLaundry = null
                     laundryType.contains("DRYER") -> {
@@ -127,11 +129,11 @@ class LaundryAdapter(
         }
     }
 
-    fun updateData(){
+    fun updateData() {
         val diffCallback = WasherDiffUtil(laundryLst, UserInfo.userLaundryLst)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
-        Log.d("updateData", "${laundryLst}")
+        Log.d("updateData", "$laundryLst")
         Log.d("updateData", "${UserInfo.userLaundryLst}")
 
         laundryLst.clear()
@@ -147,7 +149,7 @@ class LaundryAdapter(
 
         // 생성된 뷰홀더를 리스트에 추가
         val holder = LaundryViewHolder(binding)
-        Log.d("holder", "${holder}")
+        Log.d("holder", "$holder")
         viewHolders.add(holder)
 
         return holder
@@ -158,7 +160,7 @@ class LaundryAdapter(
         val binding = holder.binding
         val laundry = laundryLst[position]
 
-        Log.d("bindView", "${laundry}")
+        Log.d("bindView", "$laundry")
 
         binding.washerId.text = laundry.washerId.toString()
 

@@ -1,6 +1,7 @@
 package com.example.mywiselaundrylife.data.user
 
 import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.laundry.ListData
 
 object UserInfo {
     var userId : Int? = null
@@ -8,18 +9,21 @@ object UserInfo {
     var useDry : Laundry? = null
 
     var token : String? = null
-    var FCMtoken : String? = null
+    var FCMToken : String? = null
 
     var userLaundryLst = arrayListOf<Laundry>()
     var currentRoom : String = ""
+
+    var lstData = ListData()
 
     fun resetUserInfo(){
         userId = null
         useLaundry = null
         useDry = null
         token = null
-        FCMtoken = null
-        userLaundryLst = arrayListOf<Laundry>()
+        FCMToken = null
+        userLaundryLst = arrayListOf()
         currentRoom = ""
+        lstData = ListData()
     }
 }

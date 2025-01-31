@@ -1,8 +1,7 @@
-package com.example.mywiselaundrylife.data
+package com.example.mywiselaundrylife.diffutil
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.mywiselaundrylife.data.base.Laundry
-import java.security.PrivateKey
 
 class WasherDiffUtil(
     private val oldLst : ArrayList<Laundry>,

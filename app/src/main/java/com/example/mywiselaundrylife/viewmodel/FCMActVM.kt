@@ -1,12 +1,12 @@
-package com.example.mywiselaundrylife.vw
+package com.example.mywiselaundrylife.viewmodel
 
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.mywiselaundrylife.data.base.Laundry
-import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.data.user.UserInfo
+import com.example.mywiselaundrylife.data.user.UserInfo.lstData
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,25 +31,26 @@ class FCMActVM : ViewModel() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    fun remainWasherSum(){
+    fun remainWasherSum() {
         // 0 : 세탁기, 1 : 건조기
         val remainWasherLst = arrayOfNulls<String>(2) // String? 배열 초기화
         val remainSumLst = IntArray(2) // Int 배열 초기화
 
         // 데이터 전처리
-        ListData.laundryLst.filter { it.available }.forEach { wash ->
+        lstData.laundryLst.filter { it.available }.forEach { wash ->
             when (wash.washerType) {
                 "WASHER" -> {
                     if (remainWasherLst[0] == null) {
                         remainWasherLst[0] = "${wash.roomId} 세탁기${wash.washerId}"
-                    }else{
+                    } else {
                         remainSumLst[0]++
                     }
                 }
+
                 "DRYER" -> {
-                    if(remainWasherLst[1]== null) {
+                    if (remainWasherLst[1] == null) {
                         remainWasherLst[1] = "${wash.roomId} 건조기${wash.washerId}"
-                    }else{
+                    } else {
                         remainSumLst[1]++
                     }
                 }
@@ -62,19 +63,19 @@ class FCMActVM : ViewModel() {
         washerTxt(washer, dryer, washerSum, dryerSum)
     }
 
-    private fun washerTxt(washer : String?, dryer : String?, washerSum : Int, dryerSum : Int) {
+    private fun washerTxt(washer: String?, dryer: String?, washerSum: Int, dryerSum: Int) {
 
         Log.d("washerSum", "$washer $dryer $washerSum $dryerSum")
 
         _remainWasherTxt.value = buildString {
-            when{
+            when {
                 washer != null && dryer != null -> append("$washer, $dryer")
                 washer != null -> append(washer)
                 dryer != null -> append(dryer)
                 else -> "사용가능한 세탁 & 건조기가 없어요"
             }
 
-            when{
+            when {
                 washerSum != 0 && dryerSum != 0 -> append(" 이외에도 세탁기 ${washerSum}대 건조기 ${dryerSum}대를 사용가능해요")
                 washerSum != 0 -> append(" 이외에도 세탁기 ${washerSum}대를 사용가능해요")
                 dryerSum != 0 -> append(" 이외에도 건조기 ${dryerSum}대를 사용가능해요")
@@ -83,8 +84,8 @@ class FCMActVM : ViewModel() {
         }
     }
 
-    fun startLaundry(selectLaundry: Laundry){
-        if(timerMap.contains(selectLaundry)) return
+    fun startLaundry(selectLaundry: Laundry) {
+        if (timerMap.contains(selectLaundry)) return
 
         val runnableLaundry = object : java.lang.Runnable {
             override fun run() {
@@ -92,10 +93,15 @@ class FCMActVM : ViewModel() {
                     val now = LocalDateTime.now()
 
                     // endTime이 null인지 확인
-                    if(selectLaundry.endTime == null) {
-                        when(selectLaundry.washerType){
-                            "WASHER" -> { _laundryTimeTxt.value = "--:--" }
-                            else -> { _dryerTimeTxt.value = "--:--" }
+                    if (selectLaundry.endTime == null) {
+                        when (selectLaundry.washerType) {
+                            "WASHER" -> {
+                                _laundryTimeTxt.value = "--:--"
+                            }
+
+                            else -> {
+                                _dryerTimeTxt.value = "--:--"
+                            }
                         }
                         timerStop(selectLaundry)
                         return
@@ -108,7 +114,6 @@ class FCMActVM : ViewModel() {
                         onTimerEnd(selectLaundry, selectLaundry.washerType)
 
                     } else {
-                        Log.d("startTimer", "update : ${selectLaundry}")
                         updateTimer(selectLaundry, duration)  // 타이머 업데이트
                         handler.postDelayed(this, 1000)  // 1초 후에 다시 실행
                     }
@@ -120,7 +125,7 @@ class FCMActVM : ViewModel() {
         handler.post(runnableLaundry)
     }
 
-    fun timerStop(selectLaundry: Laundry){
+    fun timerStop(selectLaundry: Laundry) {
         timerMap[selectLaundry]?.let {
             handler.removeCallbacks(it)
             timerMap.remove(selectLaundry)
@@ -140,11 +145,12 @@ class FCMActVM : ViewModel() {
     fun onTimerEnd(selectLaundry: Laundry, laundryType: String) {
         timerStop(selectLaundry)  // 타이머 정지
 
-        when(laundryType) {
-            "WASHER" ->{
+        when (laundryType) {
+            "WASHER" -> {
                 UserInfo.useLaundry = null
                 _laundryTimeTxt.value = "--:--"
             }
+
             "DRYER" -> {
                 UserInfo.useDry = null
                 _dryerTimeTxt.value = "--:--"
@@ -155,7 +161,7 @@ class FCMActVM : ViewModel() {
         selectLaundry.user = null
     }
 
-    fun changePosition(newPosition : Int){
+    fun changePosition(newPosition: Int) {
         _selectPosition.value = newPosition
     }
 }

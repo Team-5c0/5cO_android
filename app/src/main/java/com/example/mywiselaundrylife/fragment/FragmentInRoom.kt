@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.mywiselaundrylife.act.FCMActivity
-import com.example.mywiselaundrylife.act.RefreshData
+import com.example.mywiselaundrylife.activity.FCMActivity
+import com.example.mywiselaundrylife.activity.RefreshData
 import com.example.mywiselaundrylife.adapter.LaundryAdapter
-import com.example.mywiselaundrylife.data.laundry.ListData
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.user.UserInfo.lstData
 import com.example.mywiselaundrylife.databinding.FragmentLaundryBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,17 +57,17 @@ class FragmentInRoom : Fragment() {
     }
 
     private fun setRecyclerView() {
-        UserInfo.userLaundryLst = ListData.laundryLst.filter {
+        UserInfo.userLaundryLst = lstData.laundryLst.filter {
             it.roomId == UserInfo.currentRoom
         } as ArrayList<Laundry>
 
-        if(!::laundryAdapter.isInitialized){
+        if (!::laundryAdapter.isInitialized) {
             binding.recyclerview.layoutManager = GridLayoutManager(context, 3)
             binding.recyclerview.setHasFixedSize(true)
 
             laundryAdapter = LaundryAdapter(UserInfo.userLaundryLst)
             binding.recyclerview.adapter = laundryAdapter
-        } else{
+        } else {
             laundryAdapter.updateData()
         }
     }

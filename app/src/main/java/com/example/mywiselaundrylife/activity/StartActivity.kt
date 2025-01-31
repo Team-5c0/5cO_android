@@ -1,4 +1,4 @@
-package com.example.mywiselaundrylife.act
+package com.example.mywiselaundrylife.activity
 
 import android.Manifest
 import android.content.Intent
@@ -10,7 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,6 +22,7 @@ import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.auth.AuthRequestManager
 import com.example.mywiselaundrylife.databinding.ActivityStartBinding
+import com.example.mywiselaundrylife.viewmodel.StartActVM
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
@@ -31,7 +32,8 @@ class StartActivity : AppCompatActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityStartBinding
-    private lateinit var editor : SharedPreferences.Editor
+    private lateinit var editor: SharedPreferences.Editor
+    private val viewModel: StartActVM by viewModels()
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 5000
@@ -45,9 +47,9 @@ class StartActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
         editor = sharedPreferences.edit()
 
-        if (sharedPreferences.getBoolean("isLogin", false)){
-            loginRequest(userId = sharedPreferences.getInt("myId", 0)){success ->
-                if(success){
+        if (sharedPreferences.getBoolean("isLogin", false)) {
+            loginRequest(userId = sharedPreferences.getInt("myId", 0)) { success ->
+                if (success) {
                     Log.d("login", "${UserInfo.userId}")
                 }
             }
@@ -68,26 +70,35 @@ class StartActivity : AppCompatActivity() {
         setFCMToken()
         permissionCheck()
 
-        binding.inputId.setOnFocusChangeListener{v, hasFocus ->
-            if(hasFocus){
+        lifecycleScope.launch {
+            viewModel.errorTxt.collect { errorMsg ->
+                binding.errorText.text = errorMsg
+                binding.errorText.visibility =
+                    if (errorMsg.isNotEmpty()) View.VISIBLE else View.GONE
+            }
+        }
+
+        binding.inputId.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
                 binding.inputId.hint = ""
-            } else{
+            } else {
                 binding.inputId.hint = "ex) 1101"
             }
         }
 
-        binding.toInBtn.setOnClickListener{
+        binding.toInBtn.setOnClickListener {
             binding.toInBtn.isEnabled = false
-            when{
-                binding.inputId.text.isNullOrBlank()->{
+            when {
+                binding.inputId.text.isNullOrBlank() -> {
                     binding.toInBtn.isEnabled = true
                     Log.d("myTag", "빈칸 입력해줘")
-                    showError("빈칸을 입력해주세요")
+                    viewModel.setErrorTxt("빈칸을 입력해주세요")
                 }
-                else->{
+
+                else -> {
                     val inputId = binding.inputId.text.toString().toInt()
-                    loginRequest(inputId){ success ->
-                        if (success){
+                    loginRequest(inputId) { success ->
+                        if (success) {
                             editor.putInt("myId", inputId)
                             editor.putBoolean("isLogin", true)
                             editor.apply()
@@ -98,90 +109,53 @@ class StartActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginRequest(userId : Int, callback : (Boolean) -> Unit){
+    private fun loginRequest(userId: Int, callback: (Boolean) -> Unit) {
         lifecycleScope.launch {
-            try{
+            kotlin.runCatching {
                 val loginResponse = AuthRequestManager.loginRequest(userId)
 
                 UserInfo.token = loginResponse.body()?.token
                 UserInfo.userId = userId
                 Log.d("userId", "${UserInfo.userId}")
+
                 roomRequest()
                 binding.errorText.visibility = View.GONE
                 callback(true)
 
-            } catch (e : retrofit2.HttpException){
-                Log.e("mine", "${e.message}")
-                showError("로그인에 실패하였습니다")
+            }.onFailure { e ->
+                when (e) {
+                    is retrofit2.HttpException -> {
+                        binding.toInBtn.isEnabled = true
+                        viewModel.setErrorTxt("로그인에 실패하였습니다")
+                    }
+
+                    is SocketTimeoutException -> {
+                        binding.toInBtn.isEnabled = true
+                        viewModel.setErrorTxt("요청 시간이 초과되었습니다")
+                    }
+
+                    else -> {
+                        binding.toInBtn.isEnabled = true
+                        viewModel.setErrorTxt("알 수 없는 오류가 발생하였습니다")
+                    }
+                }
                 callback(false)
-                binding.toInBtn.isEnabled = true
-            } catch(e : SocketTimeoutException){
-                    Log.e("mine", "${e.message}")
-                    showError("요청 시간이 초과되었습니다")
-                    callback(false)
-                    binding.toInBtn.isEnabled = true
-            } catch (e : Exception){
-                Log.e("mine", "${e.message}")
-                showError("알 수 없는 오류가 발생하였습니다.")
-                callback(false)
-                binding.toInBtn.isEnabled = true
             }
         }
     }
 
-    private fun roomRequest(){
-        lifecycleScope.launch {
-            try {
-                RefreshData.roomRequest()
-
-                fcmTokenRequest(UserInfo.userId!!, UserInfo.FCMtoken!!)
-
-            } catch (e : retrofit2.HttpException){
-                Log.e("mine", "${e.message}")
-                showError("방 못 받아옴")
-                binding.toInBtn.isEnabled = true
-            } catch(e : SocketTimeoutException){
-                Log.e("mine", "${e.message}")
-                showError("요청 시간이 초과되었습니다")
-                binding.toInBtn.isEnabled = true
-            } catch (e : Exception){
-                Log.e("mine", "${e.message}")
-                showError("알 수 없는 오류가 발생하였습니다.")
-                binding.toInBtn.isEnabled = true
-            }
-        }
+    private suspend fun roomRequest() {
+        RefreshData.roomRequest()
+        fcmTokenRequest(UserInfo.userId!!, UserInfo.FCMToken!!)
     }
 
-    private fun fcmTokenRequest(userId : Int, fcmToken : String){
-        lifecycleScope.launch {
-            try {
-                AuthRequestManager.fcmTokenRequest(userId, fcmToken)
-
-                binding.toInBtn.isEnabled = true
-                startMainActivity()
-
-            } catch (e : retrofit2.HttpException){
-                Log.e("mine", "${e.message}")
-                showError("파이어베이스 토큰 보내기가 실패하였습니다.")
-                binding.toInBtn.isEnabled = true
-            } catch(e : SocketTimeoutException){
-                Log.e("mine", "${e.message}")
-                showError("요청 시간이 초과되었습니다")
-                binding.toInBtn.isEnabled = true
-            }  catch (e : Exception){
-                Log.e("mine","${e.message}")
-                showError("알 수 없는 오류가 발생하였습니다.")
-                binding.toInBtn.isEnabled = true
-            }
-        }
+    private suspend fun fcmTokenRequest(userId: Int, fcmToken: String) {
+        AuthRequestManager.fcmTokenRequest(userId, fcmToken)
+        binding.toInBtn.isEnabled = true
+        startMainActivity()
     }
 
-    private fun showError(msg : String){
-        binding.errorText.text = msg
-        binding.errorText.visibility = View.VISIBLE
-    }
-
-    private fun startMainActivity(){
+    private fun startMainActivity() {
 
         Log.d("userId", "${UserInfo.useLaundry}")
 
@@ -213,7 +187,7 @@ class StartActivity : AppCompatActivity() {
                 return@OnCompleteListener
             }
             val token = task.result
-            UserInfo.FCMtoken = token
+            UserInfo.FCMToken = token
             val msg = "FCM Registration token: $token"
             Log.d("mine", msg)
         })

@@ -1,17 +1,15 @@
-package com.example.mywiselaundrylife.serve
+package com.example.mywiselaundrylife.service
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.RingtoneManager
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.example.mywiselaundrylife.R
-import com.example.mywiselaundrylife.act.StartActivity
-import com.example.mywiselaundrylife.app.createMessagingChannel
+import com.example.mywiselaundrylife.activity.StartActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -20,9 +18,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        Log.d("Firebase", "${remoteMessage}")
+        Log.d("Firebase", "$remoteMessage")
 
-        if (remoteMessage.data.isEmpty()){
+        if (remoteMessage.data.isEmpty()) {
             Log.d("Firebase", "${remoteMessage.data}")
             sendNotification(
                 remoteMessage.data["title"].toString(),
@@ -35,12 +33,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-    }
-
     @SuppressLint("RemoteViewLayout")
-    private fun msgView(title: String, message : String): RemoteViews {
+    private fun msgView(title: String, message: String): RemoteViews {
         val remoteView = RemoteViews("com.example.mywiselaundrylife", R.layout.notification)
         remoteView.setTextViewText(R.id.msgTitle, title)
         remoteView.setTextViewText(R.id.msgCnt, message)
@@ -58,8 +52,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId ="fcm_default_channel"
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channelId = "fcm_default_channel"
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.img)
@@ -77,7 +72,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
 
-    companion object {
-        private const val TAG = "MyFirebaseMsgService"
+    override fun onNewToken(token: String) {
+        Log.d("FCMToken", token)
+        super.onNewToken(token)
     }
 }
