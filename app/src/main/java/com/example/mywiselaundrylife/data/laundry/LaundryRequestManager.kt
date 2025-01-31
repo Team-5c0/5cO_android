@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 object LaundryRequestMananger {
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://43.201.132.136:8081/")
+        .baseUrl("http://43.201.18.90:8081/")
         .client(
             OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
