@@ -10,7 +10,7 @@ import com.example.mywiselaundrylife.activity.FCMActivity
 import com.example.mywiselaundrylife.data.laundry.LaundryDataUpdater
 import com.example.mywiselaundrylife.adapter.LaundryAdapter
 import com.example.mywiselaundrylife.data.user.UserInfo
-import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.response.Laundry
 import com.example.mywiselaundrylife.data.user.UserInfo.lstData
 import com.example.mywiselaundrylife.databinding.FragmentLaundryBinding
 import kotlinx.coroutines.CoroutineScope

@@ -1,8 +1,9 @@
 package com.example.mywiselaundrylife.data.laundry
 
 import android.util.Log
-import com.example.mywiselaundrylife.data.base.Laundry
-import com.example.mywiselaundrylife.data.base.Room
+import com.example.mywiselaundrylife.BuildConfig
+import com.example.mywiselaundrylife.data.response.Laundry
+import com.example.mywiselaundrylife.data.response.Room
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -10,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 object LaundryRequestManager {
     private val retrofit = Retrofit.Builder()
-        .baseUrl("http://43.201.18.90:8081/")
+        .baseUrl(BuildConfig.SERVER_API)
         .client(
             OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)

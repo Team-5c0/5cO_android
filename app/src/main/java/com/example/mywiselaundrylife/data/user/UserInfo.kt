@@ -1,6 +1,6 @@
 package com.example.mywiselaundrylife.data.user
 
-import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.response.Laundry
 import com.example.mywiselaundrylife.data.laundry.ListData
 
 object UserInfo {

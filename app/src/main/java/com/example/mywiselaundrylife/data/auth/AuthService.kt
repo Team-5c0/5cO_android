@@ -1,7 +1,7 @@
 package com.example.mywiselaundrylife.data.auth
 
-import com.example.mywiselaundrylife.data.base.FCMResponse
-import com.example.mywiselaundrylife.data.base.LoginResponse
+import com.example.mywiselaundrylife.data.response.FCMResponse
+import com.example.mywiselaundrylife.data.response.LoginResponse
 import retrofit2.Response
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -17,5 +17,4 @@ interface AuthService {
         @Query("userId") userId : Int,
         @Query("fcmToken") fcmToken : String
     ) : Response<FCMResponse>
-
 }

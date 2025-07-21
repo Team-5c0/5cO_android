@@ -1,7 +1,7 @@
 package com.example.mywiselaundrylife.data.laundry
 
-import com.example.mywiselaundrylife.data.base.Laundry
-import com.example.mywiselaundrylife.data.base.Room
+import com.example.mywiselaundrylife.data.response.Laundry
+import com.example.mywiselaundrylife.data.response.Room
 
 data class ListData (
     var roomLst : ArrayList<Room> = ArrayList(),

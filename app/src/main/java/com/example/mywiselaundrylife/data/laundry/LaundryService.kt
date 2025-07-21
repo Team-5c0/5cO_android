@@ -1,7 +1,7 @@
 package com.example.mywiselaundrylife.data.laundry
 
-import com.example.mywiselaundrylife.data.base.Laundry
-import com.example.mywiselaundrylife.data.base.Room
+import com.example.mywiselaundrylife.data.response.Laundry
+import com.example.mywiselaundrylife.data.response.Room
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header

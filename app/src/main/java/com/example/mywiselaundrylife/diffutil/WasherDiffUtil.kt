@@ -1,7 +1,7 @@
 package com.example.mywiselaundrylife.diffutil
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.response.Laundry
 
 class WasherDiffUtil(
     private val oldLst : ArrayList<Laundry>,

@@ -18,6 +18,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "SERVER_API", "\"${project.properties["SERVER_API"]}\"")
     }
 
     buildTypes {
@@ -31,7 +32,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "SERVER_API", "\"${properties["server_api"]}\"")
         }
     }
 
@@ -75,7 +75,6 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.ypwaveview)
     implementation(libs.lottie)
-    implementation(libs.google.firebase.messaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

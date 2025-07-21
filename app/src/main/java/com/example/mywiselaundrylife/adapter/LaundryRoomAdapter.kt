@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mywiselaundrylife.R
-import com.example.mywiselaundrylife.data.base.Room
+import com.example.mywiselaundrylife.data.response.Room
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.databinding.ItemLaundryRoomBinding
 import com.example.mywiselaundrylife.viewmodel.FCMActVM

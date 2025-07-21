@@ -4,7 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.response.Laundry
 import com.example.mywiselaundrylife.data.user.UserInfo
 import com.example.mywiselaundrylife.data.user.UserInfo.lstData
 import kotlinx.coroutines.Runnable

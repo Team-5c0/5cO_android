@@ -1,4 +1,4 @@
-package com.example.mywiselaundrylife.data.base
+package com.example.mywiselaundrylife.data.response
 
 data class LoginResponse(
     val token : String,

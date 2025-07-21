@@ -1,8 +1,8 @@
 package com.example.mywiselaundrylife.data.auth
 
 import android.util.Log
-import com.example.mywiselaundrylife.data.base.FCMResponse
-import com.example.mywiselaundrylife.data.base.LoginResponse
+import com.example.mywiselaundrylife.data.response.FCMResponse
+import com.example.mywiselaundrylife.data.response.LoginResponse
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit

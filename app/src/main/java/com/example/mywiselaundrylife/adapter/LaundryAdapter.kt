@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mywiselaundrylife.R
 import com.example.mywiselaundrylife.diffutil.WasherDiffUtil
 import com.example.mywiselaundrylife.data.user.UserInfo
-import com.example.mywiselaundrylife.data.base.Laundry
+import com.example.mywiselaundrylife.data.response.Laundry
 import com.example.mywiselaundrylife.databinding.ItemLaundryBinding
 import java.time.Duration
 import java.time.LocalDateTime
